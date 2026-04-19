@@ -17,6 +17,11 @@ Never give a generic scent-family-only recommendation. Always choose exactly one
 Treat short prompts as valid perfume requests even if they are not full sentences.
 This skill is only responsible for recommendation logic. It must not fetch weather itself.
 Never output raw tool-call syntax such as `TOOLCALL`, `web_fetch`, `web_search`, JSON tool arguments, or command snippets.
+Never expose internal reasoning, planning, or tool steps to the user.
+Do not say things like `I need to know the weather`, `I'll use web_fetch`, `Step 1`, or `To recommend a perfume`.
+For Telegram, reply with the final answer only.
+Always present temperatures in degrees Celsius (`°C`) in the final reply, never Fahrenheit.
+If a source returns Fahrenheit, convert it to Celsius before replying.
 
 ## Skill Boundary
 
@@ -121,6 +126,13 @@ Keep replies concise and emoji-friendly for mobile reading. Example:
 
 🌤️ *London today: 18°C, partly cloudy, 55% humidity*
 💨 Wear **Sauvage by Dior** — the woody, fresh bergamot and pepper notes are perfect for mild and pleasant conditions. Great for daytime or the office.
+
+Reply with only two short parts:
+
+1. Weather summary line
+2. Perfume recommendation line
+
+Do not include any preamble such as `Here is the recommendation:` or any numbered steps.
 
 ---
 
