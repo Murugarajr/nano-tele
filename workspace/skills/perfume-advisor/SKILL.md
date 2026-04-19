@@ -1,7 +1,7 @@
 ---
 name: perfume-advisor
 description: Recommends a perfume from the owner's personal collection based on weather, date, and occasion.
-always: true
+always: false
 ---
 
 # Perfume Advisor
