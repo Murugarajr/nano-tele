@@ -72,7 +72,7 @@
       "pathAppend": "",
       "sandbox": ""
     },
-    "restrictToWorkspace": false,
+    "restrictToWorkspace": true,
     "mcpServers": {},
     "ssrfWhitelist": []
   }
