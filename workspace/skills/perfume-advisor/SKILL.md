@@ -26,6 +26,15 @@ Never output raw tool-call syntax such as `TOOLCALL`, `web_fetch`, `web_search`,
 - If weather is missing and cannot be inferred confidently, choose the safest matching perfume from the ranked lists and say it is a best-fit pick based on the request context.
 - Do not ask follow-up questions unless the location itself is missing.
 
+## Weather Retrieval Preference
+
+- For perfume requests, prefer a single concise weather lookup instead of general web search.
+- Use `wttr.in` first when weather retrieval is needed.
+- Prefer a compact query such as `https://wttr.in/<CITY>?format=%l:+%c+%t+%h+%w` for current conditions.
+- For `tomorrow`, `tonight`, or a specific future time, prefer one concise forecast source and stop after the first usable result.
+- Do not use Google search result pages, AccuWeather pages, or multiple search/fetch loops unless the first concise source fails.
+- Once you have enough weather data to place the request into a weather bucket, stop retrieving weather and make the recommendation.
+
 ## Trigger Phrases
 
 If the message includes a location and time or date together with any of these words, treat it as a perfume recommendation request:
@@ -68,6 +77,7 @@ Follow this process in order every time:
 5. Return the first perfume that matches. If the first choice does not fit the occasion, use the next one.
 6. Do not invent alternatives outside the ranked list. Do not answer with a broad family like "light citrus or aquatic fragrance".
 7. Never attempt to call tools from inside this skill. Produce only the final recommendation text.
+8. If weather data is partial but still enough to choose a weather bucket, make the recommendation instead of asking for more detail.
 
 ---
 
