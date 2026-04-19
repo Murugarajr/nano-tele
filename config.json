@@ -2,12 +2,12 @@
   "agents": {
     "defaults": {
       "workspace": "./workspace",
-      "model": "openrouter/free",
-      "provider": "openrouter",
+      "model": "llama-3.1-8b-instant",
+      "provider": "groq",
       "maxTokens": 8192,
       "contextWindowTokens": 32768,
       "contextBlockLimit": null,
-      "temperature": 0.4,
+      "temperature": 0.2,
       "maxToolIterations": 200,
       "maxToolResultChars": 16000,
       "providerRetryMode": "standard",
@@ -36,8 +36,8 @@
     }
   },
   "providers": {
-    "openrouter": {
-      "apiKey": "${OR_API_KEY}"
+    "groq": {
+      "apiKey": "${GROQ_API_KEY}"
     }
   },
   "api": {
