@@ -77,7 +77,7 @@ Follow this process in order every time:
 Keep replies concise and emoji-friendly for mobile reading. Example:
 
 🌤️ *London today: 18°C, partly cloudy, 55% humidity*
-👃 Wear **Sauvage by Dior** — the woody, fresh bergamot and pepper notes are perfect for mild and pleasant conditions. Great for daytime or the office.
+💨 Wear **Sauvage by Dior** — the woody, fresh bergamot and pepper notes are perfect for mild and pleasant conditions. Great for daytime or the office.
 
 ---
 
