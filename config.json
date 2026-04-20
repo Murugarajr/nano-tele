@@ -2,8 +2,8 @@
   "agents": {
     "defaults": {
       "workspace": "./workspace",
-      "model": "openrouter/free",
-      "provider": "openrouter",
+      "model": "gemini-2.5-flash-lite",
+      "provider": "gemini",
       "maxTokens": 2048,
       "contextWindowTokens": 8192,
       "contextBlockLimit": null,
@@ -36,8 +36,8 @@
     }
   },
   "providers": {
-    "openrouter": {
-      "apiKey": "${OR_API_KEY}"
+    "gemini": {
+      "apiKey": "${GEMINI_API_KEY}"
     }
   },
   "api": {
