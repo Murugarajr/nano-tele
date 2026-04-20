@@ -1,7 +1,7 @@
 ---
 name: perfume-advisor
-description: Recommends a perfume from the owner's personal collection based on weather, date, and occasion.
-always: false
+description: Handles short Telegram fragrance requests like "SF tomorrow frag for work" or "Sheffield now scent" and recommends exactly one perfume from the owner's collection using weather and occasion.
+always: true
 ---
 
 # Perfume Advisor
