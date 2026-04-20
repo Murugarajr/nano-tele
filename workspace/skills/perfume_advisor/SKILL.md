@@ -1,5 +1,5 @@
 ---
-name: perfume-advisor
+name: perfume_advisor
 description: Handles short Telegram fragrance requests like "SF tomorrow frag for work" or "Sheffield now scent" and recommends exactly one perfume from the owner's collection using weather and occasion.
 always: true
 ---
