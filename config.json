@@ -2,7 +2,7 @@
   "agents": {
     "defaults": {
       "workspace": "./workspace",
-      "model": "openrouter/free",
+      "model": "openai/gpt-oss-20b",
       "provider": "openrouter",
       "maxTokens": 2048,
       "contextWindowTokens": 8192,
