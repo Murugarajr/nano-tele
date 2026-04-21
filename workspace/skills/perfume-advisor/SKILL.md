@@ -23,6 +23,11 @@ For Telegram, reply with the final answer only.
 Always present temperatures in degrees Celsius (`°C`) in the final reply, never Fahrenheit.
 If a source returns Fahrenheit, convert it to Celsius before replying.
 
+**CRITICAL — Response Delivery:**
+- NEVER use the `message` tool to send your recommendation. Just return the text as your response.
+- The nanobot gateway delivers your response automatically. Using the `message` tool causes duplicate messages or delivery failures.
+- Use ONLY the `exec` tool with `curl` for weather retrieval. Do NOT also call `web_fetch` for the same weather data. One fetch is enough.
+
 ## Skill Boundary
 
 - Assume the main agent handles weather retrieval when needed.
@@ -33,12 +38,12 @@ If a source returns Fahrenheit, convert it to Celsius before replying.
 
 ## Weather Retrieval Preference
 
-- For perfume requests, prefer a single concise weather lookup instead of general web search.
-- Use `wttr.in` first when weather retrieval is needed.
-- Prefer a compact query such as `https://wttr.in/<CITY>?format=%l:+%c+%t+%h+%w` for current conditions.
-- For `tomorrow`, `tonight`, or a specific future time, prefer one concise forecast source and stop after the first usable result.
-- Do not use Google search result pages, AccuWeather pages, or multiple search/fetch loops unless the first concise source fails.
-- Once you have enough weather data to place the request into a weather bucket, stop retrieving weather and make the recommendation.
+- For perfume requests, use a single `exec` call with `curl` — never use `web_fetch` or `web_search` for weather.
+- Use `wttr.in` via: `curl -s "wttr.in/<CITY>?format=%l:+%c+%t+%h+%w"`
+- For `tomorrow`, use: `curl -s "wttr.in/<CITY>?format=%l:+%c+%t+%h+%w&1"` or the full forecast `curl -s "wttr.in/<CITY>?1&T"`
+- **Stop after ONE successful weather fetch.** Do not make multiple weather calls for the same request.
+- Do not use Google search result pages, AccuWeather pages, or any web search/fetch for weather.
+- Once you have enough weather data to place the request into a weather bucket, stop retrieving and make the recommendation.
 
 ## Trigger Phrases
 
