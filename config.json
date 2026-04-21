@@ -15,7 +15,7 @@
       "timezone": "Europe/London",
       "dream": {
         "intervalH": 2,
-        "modelOverride": null,
+        "modelOverride": "openrouter/free",
         "maxBatchSize": 30,
         "maxIterations": 10
       }
@@ -50,7 +50,7 @@
     "port": 18790,
     "heartbeat": {
       "enabled": true,
-      "intervalS": 1800,
+      "intervalS": 21600,
       "keepRecentMessages": 8
     }
   },
