@@ -2,7 +2,7 @@
   "agents": {
     "defaults": {
       "workspace": "./workspace",
-      "model": "openai/gpt-oss-20b",
+      "model": "deepseek/deepseek-chat",
       "provider": "openrouter",
       "maxTokens": 4096,
       "contextWindowTokens": 16384,
