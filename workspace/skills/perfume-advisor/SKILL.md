@@ -1,7 +1,7 @@
 ---
 name: perfume-advisor
 description: Recommends a perfume from the owner's personal collection based on weather, date, and occasion.
-always: false
+always: true
 ---
 
 # Perfume Advisor
@@ -180,3 +180,16 @@ Use these rankings as the final tie-breaker after matching the weather bucket.
 
 - Daytime: Sultan Vetiver, Le Male Elixir, Island Vanilla Dunes
 - Evening: Le Male Elixir, Island Vanilla Dunes, Sultan Vetiver
+
+---
+
+## Validation Guardrail
+
+Before finalising your reply, you MUST verify:
+
+1. The perfume name you are about to recommend appears **EXACTLY** in the "My Perfume Collection" table above (entries #1–#14)
+2. If it does NOT appear in the table, **discard that choice immediately** and re-run the Selection Algorithm from step 3
+3. **Never** invent, substitute, or suggest perfumes outside the 14 entries in the collection — not even as alternatives or "you might also like" suggestions
+4. If no perfume clearly matches the weather bucket, default to the **first entry** in the Ranked Picks list for the detected weather bucket and occasion
+5. If the weather bucket itself is ambiguous, use the closest bucket and note the uncertainty in your reply
+6. **Every recommendation must name a specific perfume from the table** — never respond with only a scent family (e.g. "a fresh citrus fragrance")

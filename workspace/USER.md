@@ -4,45 +4,43 @@ Information about the user to help personalize interactions.
 
 ## Basic Information
 
-- **Name**: (your name)
-- **Timezone**: (your timezone, e.g., UTC+8)
-- **Language**: (preferred language)
+- **Name**: Owner
+- **Timezone**: Europe/London
+- **Language**: English
+- **Default Location**: Sheffield, UK
 
 ## Preferences
 
 ### Communication Style
 
-- [ ] Casual
+- [x] Casual
 - [ ] Professional
 - [ ] Technical
 
 ### Response Length
 
-- [ ] Brief and concise
+- [x] Brief and concise
 - [ ] Detailed explanations
 - [ ] Adaptive based on question
 
 ### Technical Level
 
 - [ ] Beginner
-- [ ] Intermediate
+- [x] Intermediate
 - [ ] Expert
-
-## Work Context
-
-- **Primary Role**: (your role, e.g., developer, researcher)
-- **Main Projects**: (what you're working on)
-- **Tools You Use**: (IDEs, languages, frameworks)
 
 ## Topics of Interest
 
-- 
-- 
-- 
+- Perfume / fragrance recommendations
+- Weather-based scent selection
+- Personal collection management
 
 ## Special Instructions
 
-(Any specific instructions for how the assistant should behave)
+- Always recommend perfumes from the saved collection only — never external perfumes
+- Use Celsius for temperatures
+- Keep Telegram replies short and emoji-friendly (2–3 lines for recommendations)
+- Fetch live weather before every perfume recommendation
 
 ---
 
