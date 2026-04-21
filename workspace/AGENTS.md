@@ -14,23 +14,21 @@ When the user asks what perfume to wear, what fragrance suits the weather, or an
 
 ### Step 1 — Fetch Weather
 
-Try these methods in order. Stop as soon as one succeeds:
-
-**Attempt 1** — `exec` with curl:
-```
-exec({"command": "curl -s \"wttr.in/<CITY>?format=%l:+%c+%t+%h+%w\""})
-```
-
-**Attempt 2** — If exec returned an error or empty output, try `web_fetch`:
+Use `web_fetch` to get weather data:
 ```
 web_fetch({"url": "https://wttr.in/<CITY>?format=%l:+%c+%t+%h+%w", "extractMode": "text", "maxChars": 200})
 ```
 
-**Attempt 3** — If both failed, infer the weather bucket from your general knowledge of the city and time of year (e.g. Mumbai in April = Hot & humid). Note in your reply that weather data was estimated.
+If `web_fetch` fails, try `exec` as fallback:
+```
+exec({"command": "curl -s \"wttr.in/<CITY>?format=%l:+%c+%t+%h+%w\""})
+```
+
+If both fail, infer the weather bucket from your general knowledge of the city and time of year (e.g. Mumbai in April = Hot & humid). Note in your reply that weather data was estimated.
 
 Replace `<CITY>` with the city from the user's message. If no city given, use Sheffield.
 
-After getting weather data (or inferring it), **stop calling tools**. Do steps 2–6 internally and return your text response.
+**IMPORTANT**: Do NOT tell the user what tools you are calling or what you plan to do. Never say "I'll try fetching" or "Let me check". Just get the data and respond with the recommendation directly.
 
 ### Step 2 — Classify Weather Bucket
 
