@@ -8,7 +8,7 @@
       "contextWindowTokens": 16384,
       "contextBlockLimit": 20,
       "temperature": 0.2,
-      "maxToolIterations": 20,
+      "maxToolIterations": 5,
       "maxToolResultChars": 2000,
       "providerRetryMode": "standard",
       "reasoningEffort": null,
