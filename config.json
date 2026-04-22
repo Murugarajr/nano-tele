@@ -50,7 +50,7 @@
     "port": 18790,
     "heartbeat": {
       "enabled": true,
-      "intervalS": 21600,
+      "intervalS": 86400,
       "keepRecentMessages": 8
     }
   },
