@@ -28,7 +28,7 @@ From temperature and humidity:
 - `Mild`: `15-25°C`
 - `Cool & dry`: `10-15°C` and `<60%`
 - `Cold & dry`: `<10°C` and `<60%`
-- `Cold & rainy/wet`: `<15°C` and `>=60%`
+- `Cold & rainy`: `<15°C` and `>=60%`
 
 ### Step 2 — Infer Occasion
 
@@ -123,7 +123,7 @@ If weather data is partial but enough to choose a bucket, make the recommendatio
 - Daytime: Sultan Vetiver, Stronger With You Intensely, Le Male Elixir
 - Evening: Le Male Elixir, Stronger With You Intensely, Island Vanilla Dunes, Sultan Vetiver
 
-### Cold & rainy/wet
+### Cold & rainy
 - Daytime: Sultan Vetiver, Le Male Elixir, Island Vanilla Dunes
 - Evening: Le Male Elixir, Island Vanilla Dunes, Sultan Vetiver
 

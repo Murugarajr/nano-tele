@@ -3,7 +3,8 @@
 This file tracks perfume recommendations by date and weather bucket to ensure variety.
 
 ## Format
-Each entry: `YYYY-MM-DD | City | Weather Bucket | Occasion | Perfume Recommended`
+Each entry must be appended as a markdown table row:
+`| YYYY-MM-DD | City | Weather Bucket | Occasion | Perfume |`
 
 ## Recent Picks (Last 7 Days)
 

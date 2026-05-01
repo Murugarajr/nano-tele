@@ -39,7 +39,7 @@ Replace `<CITY>` with the city from the user's message. If no city given, use Sh
 | Mild | 15–25°C | Any |
 | Cool & dry | 10–15°C | <60% |
 | Cold & dry | <10°C | <60% |
-| Cold & rainy/wet | <15°C | ≥60% |
+| Cold & rainy | <15°C | ≥60% |
 
 ### Step 3 — Infer Occasion
 
@@ -58,7 +58,8 @@ Use the perfume-advisor skill's **Strict Selection Algorithm** which includes:
 4. Apply **Rule C** — Fall back to similar scent family if needed
 5. Pick the first eligible match from the ranked list
 
-After selecting, append the new entry with city to `RECENT_PICKS.md` (Step 6 of the skill algorithm).
+After selecting, append the new entry with city to `RECENT_PICKS.md` (Step 6 of the skill algorithm) using an exact markdown table row:
+`| YYYY-MM-DD | City | Weather Bucket | Occasion | Perfume |`
 
 ### Step 5 — Validate
 

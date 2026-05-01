@@ -39,7 +39,7 @@ User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + tools + memory)
 ├── main.py              # Entry point: launches nanobot gateway + health server
 ├── config.json          # Agent, channel, provider & tool configuration
 ├── requirements.txt     # Python dependencies
-├── cron/                # Scheduled job definitions
+├── workspace/cron/      # Scheduled job definitions
 ├── history/             # CLI history
 └── workspace/
     ├── SOUL.md          # Bot identity, personality & core rules
@@ -103,7 +103,8 @@ Example output:
 | Max tokens | 4096 |
 | Temperature | 0.2 |
 | Timezone | Europe/London |
-| Dream interval | Every 2 hours (free model batch processing) |
+| Dream interval | Every 2 hours (`agents.defaults.dream.intervalH`) |
+| Gateway heartbeat interval | Every 24 hours (`gateway.heartbeat.intervalS = 86400`) |
 | Tool exec timeout | 60s |
 | Web search | DuckDuckGo, max 1 result |
 
