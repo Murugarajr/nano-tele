@@ -51,7 +51,14 @@ Replace `<CITY>` with the city from the user's message. If no city given, use Sh
 
 ### Step 4 — Select Perfume
 
-Use the perfume-advisor skill's collection table and ranked picks. Filter by weather bucket, then apply occasion ranking. Pick the first match.
+Use the perfume-advisor skill's **Strict Selection Algorithm** which includes:
+1. Read `workspace/memory/RECENT_PICKS.md` to check yesterday's recommendations for this city
+2. Apply **Rule A** — Skip if same perfume was recommended yesterday for the SAME city + SAME weather bucket
+3. Apply **Rule B** — Skip any perfume recommended yesterday globally (any city, consecutive day rule)
+4. Apply **Rule C** — Fall back to similar scent family if needed
+5. Pick the first eligible match from the ranked list
+
+After selecting, append the new entry with city to `RECENT_PICKS.md` (Step 6 of the skill algorithm).
 
 ### Step 5 — Validate
 
@@ -73,6 +80,29 @@ No preamble. No numbered steps. No tool output. Do NOT wrap this in a `message` 
 ## Non-Perfume Requests
 
 For general questions unrelated to perfume, respond helpfully and concisely.
+
+---
+
+## History Command
+
+When the user asks for "/history", "history", "recent picks", "recent recommendations", or "what did I wear recently":
+
+1. Read `workspace/memory/RECENT_PICKS.md` using `read_file`
+2. Parse the last 7 entries (most recent recommendations)
+3. Format as a concise list and return as plain text
+
+**Response format:**
+```
+📜 *Recent Recommendations (Last 7 Days)*
+
+• Today: **Sauvage** — London (Mild)
+• Yesterday: **Imagination** — Sheffield (Cool & dry)
+• 2 days ago: **Le Beau** — London (Hot & humid)
+
+💡 *I rotate perfumes to keep things fresh — no repeats on consecutive days!*
+```
+
+If the log is empty or has fewer than 2 entries, reply: "*No recent recommendations yet. Ask me what to wear today!*"
 
 ---
 

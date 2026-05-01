@@ -14,22 +14,67 @@ Always present temperatures in °C. Convert if needed.
 
 ## Strict Selection Algorithm
 
-1. Determine the weather bucket from temperature and humidity:
-   - `Hot & dry`: `>25°C` and `<50%`
-   - `Hot & humid`: `>25°C` and `>=50%`
-   - `Mild`: `15-25°C`
-   - `Cool & dry`: `10-15°C` and `<60%`
-   - `Cold & dry`: `<10°C` and `<60%`
-   - `Cold & rainy/wet`: `<15°C` and `>=60%`
-2. Infer occasion from the prompt or time:
-   - `office`, `work`, `meeting` → office
-   - `date`, `date night`, `dinner`, `party`, `night out` → evening
-   - Before 17:00 → daytime
-   - 17:00 or later → evening
-3. Filter to perfumes whose `Best Weather` matches the weather bucket.
-4. Apply the ranked priority list for the inferred occasion.
-5. Return the first perfume that matches.
-6. If weather data is partial but enough to choose a bucket, make the recommendation.
+### Step 0 — Check Recent Recommendations
+
+BEFORE selecting a perfume, read `workspace/memory/RECENT_PICKS.md` to check:
+1. **What was recommended yesterday for the SAME city and SAME weather bucket**
+2. **What was recommended yesterday** regardless of city or weather (global consecutive day rule)
+
+### Step 1 — Determine Weather Bucket
+
+From temperature and humidity:
+- `Hot & dry`: `>25°C` and `<50%`
+- `Hot & humid`: `>25°C` and `>=50%`
+- `Mild`: `15-25°C`
+- `Cool & dry`: `10-15°C` and `<60%`
+- `Cold & dry`: `<10°C` and `<60%`
+- `Cold & rainy/wet`: `<15°C` and `>=60%`
+
+### Step 2 — Infer Occasion
+
+From the prompt or time:
+- `office`, `work`, `meeting` → office
+- `date`, `date night`, `dinner`, `party`, `night out` → evening
+- Before 17:00 → daytime
+- 17:00 or later → evening
+
+### Step 3 — Build Candidate List
+
+Filter to perfumes whose `Best Weather` matches the weather bucket, then apply the ranked priority list for the inferred occasion.
+
+### Step 4 — Apply Rotation Rules
+
+**Rule A — Same City + Same Weather Rotation:**
+If the top-ranked perfume was recommended YESTERDAY for the SAME city AND SAME weather bucket, SKIP it and pick the NEXT perfume in the ranked list.
+
+*Example: If "Sauvage" was picked yesterday for London (Mild), don't pick it today for London (Mild) — but it's OK for Sheffield (Mild).*
+
+**Rule B — Global Consecutive Day Rule:**
+Regardless of city or weather, if a perfume was recommended YESTERDAY (any city, any weather bucket), do NOT recommend it today. Skip to the next eligible perfume.
+
+*Example: If "Sauvage" was picked yesterday for ANY city, don't pick it today for ANY city.*
+
+**Rule C — Similar Scent Family Fallback:**
+If both Rule A and Rule B eliminate the top candidates, prioritize perfumes with the **same scent family** as the skipped perfume(s). Similar families:
+- Citrus group: Citrus Aquatic, Citrus Fruity Oriental, Citrus Aromatic
+- Woody group: Woody Fresh, Aromatic Woody, Aquatic Woody, Oriental Woody, Fruity Woody, Amber Woody Vetiver
+- Gourmand group: Amber Gourmand, Oriental Gourmand
+- Fresh/Aquatic group: Fresh Aquatic, Marine Aromatic
+
+### Step 5 — Select Final Perfume
+
+Pick the first eligible perfume from the ranked list after applying all rotation rules.
+
+### Step 6 — Log the Recommendation
+
+After making a recommendation, append to `workspace/memory/RECENT_PICKS.md`:
+```
+| YYYY-MM-DD | [City Name] | [Weather Bucket] | [Occasion] | [Perfume Name] |
+```
+
+### Step 7 — Validation
+
+If weather data is partial but enough to choose a bucket, make the recommendation.
 
 ---
 
