@@ -146,6 +146,45 @@ def infer_occasion(text: str = "", requested: str | None = None, now: datetime |
     return "Daytime" if current.hour < 17 else "Evening"
 
 
+def extract_city(text: str) -> str | None:
+    cleaned = text.strip()
+    command_match = re.match(r"^/(?:today|office|evening|date)\s+(.+)$", cleaned, flags=re.IGNORECASE)
+    if command_match:
+        return tidy_city(command_match.group(1))
+
+    patterns = [
+        r"\bin\s+([a-z][a-z .'-]+?)(?:\s+(?:today|tonight|now|this morning|this evening|for\b)|[?.!]|$)",
+        r"\bfor\s+([a-z][a-z .'-]+?)(?:\s+(?:today|tonight|now|this morning|this evening)|[?.!]|$)",
+        r"\bwear\s+([a-z][a-z .'-]+?)(?:\s+(?:today|tonight|now|this morning|this evening)|[?.!]|$)",
+    ]
+    for pattern in patterns:
+        match = re.search(pattern, cleaned, flags=re.IGNORECASE)
+        if match:
+            city = tidy_city(match.group(1))
+            if city and city.casefold() not in {"today", "tonight", "now", "perfume", "fragrance", "scent"}:
+                return city
+    return None
+
+
+def tidy_city(value: str) -> str:
+    city = re.sub(r"\b(today|tonight|now|please|pls)\b", "", value, flags=re.IGNORECASE)
+    city = re.sub(r"\s+", " ", city).strip(" ?.!,'\"")
+    return city.title() if city else ""
+
+
+def route_occasion(text: str) -> str | None:
+    lowered = text.lower()
+    if lowered.startswith("/office") or any(word in lowered for word in ("office", "work", "meeting")):
+        return "office"
+    if lowered.startswith("/date") or "date" in lowered:
+        return "date"
+    if lowered.startswith("/evening") or any(word in lowered for word in ("evening", "dinner", "party", "night out", "tonight")):
+        return "evening"
+    if lowered.startswith("/today") or any(phrase in lowered for phrase in ("what should i wear", "perfume", "fragrance", "scent", "wear")):
+        return "today"
+    return None
+
+
 def active_city(city: str | None = None) -> str:
     if city:
         return city
@@ -347,6 +386,31 @@ def command_recommend(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_route(args: argparse.Namespace) -> int:
+    text = args.text.strip()
+    lowered = text.lower()
+    slash = re.match(r"^/([a-z]+)(?:@\w+)?(?:\s+.*)?$", lowered)
+    slash_command = slash.group(1) if slash else ""
+    if slash_command == "history" or lowered in {"history", "recent picks", "recent recommendations"} or "what did i wear recently" in lowered:
+        return command_history(argparse.Namespace(limit=7))
+    if slash_command == "stats" or lowered == "stats" or any(phrase in lowered for phrase in ("sotd stats", "most worn", "least worn")):
+        return command_stats(argparse.Namespace())
+    if "clear travel mode" in lowered or "back to sheffield" in lowered:
+        return command_travel(argparse.Namespace(city=None, clear=True))
+    travel_match = re.search(r"\b(?:i'?m|i am|use)\s+(?:in\s+)?([a-z][a-z .'-]+?)(?:\s+for\s+\d+\s+days|\s+this week|[?.!]|$)", text, flags=re.IGNORECASE)
+    if travel_match and any(word in lowered for word in ("for", "this week")):
+        return command_travel(argparse.Namespace(city=tidy_city(travel_match.group(1)), clear=False))
+    if "show my collection" in lowered or lowered in {"collection", "/collection"}:
+        return command_collection(argparse.Namespace(action="list"))
+
+    occasion = route_occasion(text)
+    if occasion:
+        return command_recommend(argparse.Namespace(city=extract_city(text), occasion=occasion, text=text))
+
+    print("Send /today, /office, /evening, /date, /history, or /stats.")
+    return 0
+
+
 def command_history(args: argparse.Namespace) -> int:
     rows = parse_recent_rows()[-args.limit :]
     if not rows:
@@ -457,6 +521,10 @@ def build_parser() -> argparse.ArgumentParser:
     recommend.add_argument("--occasion", choices=["today", "daytime", "office", "evening", "date"])
     recommend.add_argument("--text", default="")
     recommend.set_defaults(func=command_recommend)
+
+    route = subparsers.add_parser("route")
+    route.add_argument("--text", required=True)
+    route.set_defaults(func=command_route)
 
     history = subparsers.add_parser("history")
     history.add_argument("--limit", type=int, default=7)

@@ -149,6 +149,7 @@ python workspace/tools/perfume_tool.py stats
 python workspace/tools/perfume_tool.py travel "Dubai"
 python workspace/tools/perfume_tool.py travel --clear
 python workspace/tools/perfume_tool.py collection list
+./workspace/tools/perfume_tool.py route --text "/today"
 ```
 
 ## Tests
@@ -156,6 +157,8 @@ python workspace/tools/perfume_tool.py collection list
 ```bash
 /Users/ohm/Documents/projects/pyenvs/sandbox/bin/python -m unittest discover -s tests
 ```
+
+On Railway, Nanobot should call the executable workspace script (`./tools/perfume_tool.py ...`) from inside `workspace/`; the script uses `#!/usr/bin/env python3`, so it resolves to Railway's active Python environment.
 
 ## Customising
 
