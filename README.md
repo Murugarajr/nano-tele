@@ -143,13 +143,13 @@ The installed Nanobot Telegram channel does not currently expose inline keyboard
 ## Local Tool Usage
 
 ```bash
-python workspace/tools/perfume_tool.py recommend --occasion office --city "Sheffield"
-python workspace/tools/perfume_tool.py history --limit 7
-python workspace/tools/perfume_tool.py stats
-python workspace/tools/perfume_tool.py travel "Dubai"
-python workspace/tools/perfume_tool.py travel --clear
-python workspace/tools/perfume_tool.py collection list
-./workspace/tools/perfume_tool.py route --text "/today"
+sh workspace/tools/perfume recommend --occasion office --city "Sheffield"
+sh workspace/tools/perfume history --limit 7
+sh workspace/tools/perfume stats
+sh workspace/tools/perfume travel "Dubai"
+sh workspace/tools/perfume travel --clear
+sh workspace/tools/perfume collection list
+sh workspace/tools/perfume route --text "/today"
 ```
 
 ## Tests
@@ -158,7 +158,7 @@ python workspace/tools/perfume_tool.py collection list
 /Users/ohm/Documents/projects/pyenvs/sandbox/bin/python -m unittest discover -s tests
 ```
 
-On Railway, Nanobot should call the executable workspace script (`./tools/perfume_tool.py ...`) from inside `workspace/`; the script uses `#!/usr/bin/env python3`, so it resolves to Railway's active Python environment.
+On Railway, Nanobot should call the workspace wrapper (`sh tools/perfume ...`) from inside `workspace/`; the wrapper selects `python3` or `python` from Railway's active environment.
 
 ## Customising
 

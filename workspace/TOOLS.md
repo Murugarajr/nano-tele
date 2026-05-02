@@ -15,15 +15,15 @@ This file documents non-obvious constraints and usage patterns.
 Use the local deterministic helper for fragrance workflows:
 
 ```bash
-./tools/perfume_tool.py route --text "/today"
-./tools/perfume_tool.py route --text "/history"
-./tools/perfume_tool.py route --text "Show my collection"
-./tools/perfume_tool.py recommend --occasion today --city "Sheffield"
-./tools/perfume_tool.py stats
-./tools/perfume_tool.py feedback "Sauvage" liked --notes "lasted well"
-./tools/perfume_tool.py travel "Dubai"
-./tools/perfume_tool.py travel --clear
-./tools/perfume_tool.py collection list
+sh tools/perfume route --text "/today"
+sh tools/perfume route --text "/history"
+sh tools/perfume route --text "Show my collection"
+sh tools/perfume recommend --occasion today --city "Sheffield"
+sh tools/perfume stats
+sh tools/perfume feedback "Sauvage" liked --notes "lasted well"
+sh tools/perfume travel "Dubai"
+sh tools/perfume travel --clear
+sh tools/perfume collection list
 ```
 
 The tool is workspace-local, uses Open-Meteo JSON weather data, and writes recommendation history and feedback into `workspace/memory/`.
