@@ -1,7 +1,20 @@
-#!/usr/bin/env sh
-set -eu
+#!/bin/sh
 
-SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+SCRIPT_DIR=$(CDPATH= cd "$(dirname "$0")" 2>/dev/null && pwd)
+if [ -z "$SCRIPT_DIR" ]; then
+  echo "Perfume helper error: unable to resolve script directory" >&2
+  exit 126
+fi
+
+if [ "${1:-}" = "__diag" ]; then
+  echo "cwd=$(pwd)"
+  echo "script_dir=$SCRIPT_DIR"
+  echo "path=${PATH:-}"
+  echo "python3=$(command -v python3 2>/dev/null || true)"
+  echo "python=$(command -v python 2>/dev/null || true)"
+  echo "tool_exists=$(test -f "$SCRIPT_DIR/perfume_tool.py" && echo yes || echo no)"
+  exit 0
+fi
 
 if command -v python3 >/dev/null 2>&1; then
   exec python3 "$SCRIPT_DIR/perfume_tool.py" "$@"
