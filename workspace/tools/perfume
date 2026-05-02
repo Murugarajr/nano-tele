@@ -60,7 +60,7 @@ EOF
       ;;
   esac
 
-  if printf '%s' "$LOWER" | grep -Eq '(^/today|^/office|^/evening|^/date|wear|perfume|fragrance|scent)'; then
+  if printf '%s' "$LOWER" | grep -Eq '(^/today|^today\b| today\b|^/office|^office\b|^/evening|^evening\b|^/date|^date\b|wear|perfume|fragrance|scent)'; then
     CITY="Sheffield"
     if printf '%s' "$LOWER" | grep -q 'london'; then
       CITY="London"
