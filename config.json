@@ -49,7 +49,7 @@
     "host": "0.0.0.0",
     "port": 18790,
     "heartbeat": {
-      "enabled": true,
+      "enabled": false,
       "intervalS": 1800,
       "keepRecentMessages": 8
     }

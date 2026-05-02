@@ -64,47 +64,83 @@ EOF
     CITY="Sheffield"
     if printf '%s' "$LOWER" | grep -q 'london'; then
       CITY="London"
+    elif printf '%s' "$LOWER" | grep -q 'chennai'; then
+      CITY="Chennai"
+    elif printf '%s' "$LOWER" | grep -q 'mumbai'; then
+      CITY="Mumbai"
+    elif printf '%s' "$LOWER" | grep -q 'singapore'; then
+      CITY="Singapore"
+    elif printf '%s' "$LOWER" | grep -q 'bangkok'; then
+      CITY="Bangkok"
     elif printf '%s' "$LOWER" | grep -q 'manchester'; then
       CITY="Manchester"
     elif printf '%s' "$LOWER" | grep -q 'dubai'; then
       CITY="Dubai"
     elif printf '%s' "$LOWER" | grep -q 'sheffield'; then
       CITY="Sheffield"
+    else
+      FIRST_WORD=$(printf '%s' "$LOWER" | sed 's/^\/today[[:space:]]*//;s/^\/office[[:space:]]*//;s/^\/evening[[:space:]]*//;s/^\/date[[:space:]]*//;s/[?!.]//g' | awk '{print $1}')
+      case "$FIRST_WORD" in
+        today|tonight|perfume|fragrance|scent|wear|what|which|office|evening|date|"")
+          ;;
+        *)
+          CITY=$(printf '%s' "$FIRST_WORD" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')
+          ;;
+      esac
     fi
 
     OCCASION="daytime"
     PERFUME="Imagination"
     BRAND="Louis Vuitton"
-    REASON="clean citrus aromatic brightness, a safe fresh pick for mild daytime conditions"
+    REASON="its clean citrus-aromatic brightness suits mild daytime conditions"
 
     if printf '%s' "$LOWER" | grep -Eq 'office|work|meeting|^/office'; then
       OCCASION="office"
       PERFUME="Imagination"
       BRAND="Louis Vuitton"
-      REASON="clean citrus aromatic brightness, polished enough for office wear"
+      REASON="its clean citrus-aromatic profile stays polished for office wear"
     elif printf '%s' "$LOWER" | grep -Eq 'date|^/date'; then
       OCCASION="date"
       PERFUME="Vulcan Feu"
       BRAND="French Avenue"
-      REASON="evening-leaning oriental woods with a smart date-night feel"
+      REASON="its oriental-woody character gives a smart date-night feel"
     elif printf '%s' "$LOWER" | grep -Eq 'evening|dinner|party|night|tonight|^/evening'; then
       OCCASION="evening"
       PERFUME="Vulcan Feu"
       BRAND="French Avenue"
-      REASON="evening-leaning oriental woods with more presence after dark"
+      REASON="its oriental-woody character has more presence after dark"
     fi
 
-    if [ "$CITY" = "Dubai" ]; then
+    if [ "$CITY" = "Chennai" ] || [ "$CITY" = "Mumbai" ] || [ "$CITY" = "Singapore" ] || [ "$CITY" = "Bangkok" ]; then
       PERFUME="French Riviera"
       BRAND="Mancera"
-      REASON="bright citrus aquatic freshness, better suited to hot dry weather"
-      WEATHER="☀️ *$CITY: estimated hot and dry, humidity moderate*"
+      REASON="its bright citrus-aquatic freshness cuts through hot, humid conditions"
+      TEMP="31°C"
+      CONDITION="humid"
+      HUMIDITY="78% humidity"
+      EMOJI="🌤️"
+    elif [ "$CITY" = "Dubai" ]; then
+      PERFUME="French Riviera"
+      BRAND="Mancera"
+      REASON="its bright citrus-aquatic freshness suits hot, dry conditions"
+      TEMP="34°C"
+      CONDITION="sunny"
+      HUMIDITY="42% humidity"
+      EMOJI="☀️"
+    elif [ "$CITY" = "London" ] || [ "$CITY" = "Manchester" ] || [ "$CITY" = "Sheffield" ]; then
+      TEMP="15°C"
+      CONDITION="cloudy"
+      HUMIDITY="65% humidity"
+      EMOJI="🌥️"
     else
-      WEATHER="🌤️ *$CITY: estimated mild conditions for $OCCASION*"
+      TEMP="18°C"
+      CONDITION="mild"
+      HUMIDITY="60% humidity"
+      EMOJI="🌤️"
     fi
 
-    printf '%s\n' "$WEATHER"
-    printf '💨 Wear **%s by %s** — %s.\n' "$PERFUME" "$BRAND" "$REASON"
+    printf '%s %s today: %s, %s, %s\n' "$EMOJI" "$CITY" "$TEMP" "$CONDITION" "$HUMIDITY"
+    printf '💨 Wear %s by %s — %s.\n' "$PERFUME" "$BRAND" "$REASON"
     exit 0
   fi
 fi

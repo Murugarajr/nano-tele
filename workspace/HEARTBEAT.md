@@ -9,10 +9,9 @@ If this file has no tasks (only headers and comments), the agent will skip the h
 
 <!-- Add your periodic tasks below this line -->
 
-- Morning SOTD reminder: if the owner asks for it, create a cron job that runs `sh tools/perfume recommend --occasion today` and sends the output to Telegram.
-- Weather-change check: for active travel mode or Sheffield, compare morning and evening conditions before proactive recommendations so picks account for humidity, rain risk, and daily high.
-
 
 ## Completed
 
 <!-- Move completed tasks here or delete them -->
+
+- Disabled proactive perfume heartbeat checks to prevent unsolicited Telegram error messages. Use explicit cron jobs only when reminders are requested.
