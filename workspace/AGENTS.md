@@ -61,7 +61,7 @@ If the user gives a city, pass `--city "City Name"`. If not, omit `--city`; the 
 
 - `/history`, "recent picks", "what did I wear recently" -> execute `sh tools/perfume route --text "..."`
 - `/stats`, "SOTD stats", "most worn", "least worn" -> execute `sh tools/perfume route --text "..."`
-- `diagnose perfume helper` -> execute `sh tools/perfume __diag`
+- `diagnose perfume helper` -> execute `sh tools/perfume __diag` and return the raw output exactly. Do not summarize or interpret diagnostic output.
 
 Return the tool output directly.
 

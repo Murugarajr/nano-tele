@@ -13,6 +13,59 @@ if [ "${1:-}" = "__diag" ]; then
   echo "python3=$(command -v python3 2>/dev/null || true)"
   echo "python=$(command -v python 2>/dev/null || true)"
   echo "tool_exists=$(test -f "$SCRIPT_DIR/perfume_tool.py" && echo yes || echo no)"
+  echo "data_exists=$(test -f "$SCRIPT_DIR/../data/fragrances.json" && echo yes || echo no)"
+  echo "recent_exists=$(test -f "$SCRIPT_DIR/../memory/RECENT_PICKS.md" && echo yes || echo no)"
+  exit 0
+fi
+
+if [ "${1:-}" = "route" ] && [ "${2:-}" = "--text" ]; then
+  case "$(printf '%s' "${3:-}" | tr '[:upper:]' '[:lower:]')" in
+    "show my collection"|collection|"/collection")
+      cat <<'EOF'
+• **French Riviera** by Mancera — Citrus Aquatic
+• **Le Beau** by Jean Paul Gaultier — Fresh Aquatic
+• **Le Male Elixir** by Jean Paul Gaultier — Amber Gourmand
+• **Erba Pura** by Xerjoff — Citrus Fruity Oriental
+• **Sauvage** by Dior — Woody Fresh
+• **Born in Roma Uomo** by Valentino — Aromatic Woody
+• **Stronger With You Intensely** by Emporio Armani — Oriental Gourmand
+• **Cool Water** by Davidoff — Marine Aromatic
+• **Hawas for Him** by Rasasi — Aquatic Woody
+• **Vulcan Feu** by French Avenue — Oriental Woody
+• **Island Vanilla Dunes** by Khadlaj — Oriental Gourmand
+• **Club de Nuit Intense Man** by Armaf — Fruity Woody
+• **Imagination** by Louis Vuitton — Citrus Aromatic
+• **Sultan Vetiver** by Nishane — Amber Woody Vetiver
+EOF
+      exit 0
+      ;;
+    "/history"|history|"recent picks"|"recent recommendations")
+      RECENT="$SCRIPT_DIR/../memory/RECENT_PICKS.md"
+      if [ ! -f "$RECENT" ] || ! grep -Eq '^\| [0-9]{4}-[0-9]{2}-[0-9]{2} \|' "$RECENT"; then
+        printf '%s\n' '*No recent recommendations yet. Ask me what to wear today!*'
+        exit 0
+      fi
+      printf '%s\n\n' '📜 *Recent Recommendations*'
+      grep -E '^\| [0-9]{4}-[0-9]{2}-[0-9]{2} \|' "$RECENT" | tail -n 7 | while IFS='|' read -r _ d city bucket occasion perfume _; do
+        d=$(printf '%s' "$d" | sed 's/^ *//;s/ *$//')
+        city=$(printf '%s' "$city" | sed 's/^ *//;s/ *$//')
+        bucket=$(printf '%s' "$bucket" | sed 's/^ *//;s/ *$//')
+        occasion=$(printf '%s' "$occasion" | sed 's/^ *//;s/ *$//')
+        perfume=$(printf '%s' "$perfume" | sed 's/^ *//;s/ *$//')
+        printf '• %s: **%s** — %s (%s, %s)\n' "$d" "$perfume" "$city" "$bucket" "$occasion"
+      done
+      exit 0
+      ;;
+  esac
+fi
+
+if [ "${1:-}" = "collection" ] && [ "${2:-}" = "list" ]; then
+  sh "$0" route --text "show my collection"
+  exit 0
+fi
+
+if [ "${1:-}" = "history" ]; then
+  sh "$0" route --text "/history"
   exit 0
 fi
 
