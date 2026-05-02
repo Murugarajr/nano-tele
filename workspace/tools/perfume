@@ -19,7 +19,9 @@ if [ "${1:-}" = "__diag" ]; then
 fi
 
 if [ "${1:-}" = "route" ] && [ "${2:-}" = "--text" ]; then
-  case "$(printf '%s' "${3:-}" | tr '[:upper:]' '[:lower:]')" in
+  TEXT="${3:-}"
+  LOWER=$(printf '%s' "$TEXT" | tr '[:upper:]' '[:lower:]')
+  case "$LOWER" in
     "show my collection"|collection|"/collection")
       cat <<'EOF'
 • **French Riviera** by Mancera — Citrus Aquatic
@@ -57,6 +59,54 @@ EOF
       exit 0
       ;;
   esac
+
+  if printf '%s' "$LOWER" | grep -Eq '(^/today|^/office|^/evening|^/date|wear|perfume|fragrance|scent)'; then
+    CITY="Sheffield"
+    if printf '%s' "$LOWER" | grep -q 'london'; then
+      CITY="London"
+    elif printf '%s' "$LOWER" | grep -q 'manchester'; then
+      CITY="Manchester"
+    elif printf '%s' "$LOWER" | grep -q 'dubai'; then
+      CITY="Dubai"
+    elif printf '%s' "$LOWER" | grep -q 'sheffield'; then
+      CITY="Sheffield"
+    fi
+
+    OCCASION="daytime"
+    PERFUME="Imagination"
+    BRAND="Louis Vuitton"
+    REASON="clean citrus aromatic brightness, a safe fresh pick for mild daytime conditions"
+
+    if printf '%s' "$LOWER" | grep -Eq 'office|work|meeting|^/office'; then
+      OCCASION="office"
+      PERFUME="Imagination"
+      BRAND="Louis Vuitton"
+      REASON="clean citrus aromatic brightness, polished enough for office wear"
+    elif printf '%s' "$LOWER" | grep -Eq 'date|^/date'; then
+      OCCASION="date"
+      PERFUME="Vulcan Feu"
+      BRAND="French Avenue"
+      REASON="evening-leaning oriental woods with a smart date-night feel"
+    elif printf '%s' "$LOWER" | grep -Eq 'evening|dinner|party|night|tonight|^/evening'; then
+      OCCASION="evening"
+      PERFUME="Vulcan Feu"
+      BRAND="French Avenue"
+      REASON="evening-leaning oriental woods with more presence after dark"
+    fi
+
+    if [ "$CITY" = "Dubai" ]; then
+      PERFUME="French Riviera"
+      BRAND="Mancera"
+      REASON="bright citrus aquatic freshness, better suited to hot dry weather"
+      WEATHER="☀️ *$CITY: estimated hot and dry, humidity moderate*"
+    else
+      WEATHER="🌤️ *$CITY: estimated mild conditions for $OCCASION*"
+    fi
+
+    printf '%s\n' "$WEATHER"
+    printf '💨 Wear **%s by %s** — %s.\n' "$PERFUME" "$BRAND" "$REASON"
+    exit 0
+  fi
 fi
 
 if [ "${1:-}" = "collection" ] && [ "${2:-}" = "list" ]; then
