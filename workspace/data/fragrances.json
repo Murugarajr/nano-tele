@@ -1,0 +1,114 @@
+[
+  {
+    "name": "French Riviera",
+    "brand": "Mancera",
+    "family": "Citrus Aquatic",
+    "best_weather": ["Hot & dry", "Hot & humid", "Mild"],
+    "best_occasion": ["Daytime", "Casual", "Summer"],
+    "summary": "bright citrus aquatic freshness"
+  },
+  {
+    "name": "Le Beau",
+    "brand": "Jean Paul Gaultier",
+    "family": "Fresh Aquatic",
+    "best_weather": ["Hot & humid", "Mild"],
+    "best_occasion": ["Casual", "Daytime", "Beach"],
+    "summary": "fresh aquatic sweetness for warm air"
+  },
+  {
+    "name": "Le Male Elixir",
+    "brand": "Jean Paul Gaultier",
+    "family": "Amber Gourmand",
+    "best_weather": ["Cold & dry", "Cold & rainy"],
+    "best_occasion": ["Evening", "Night out", "Winter"],
+    "summary": "rich amber warmth for cold evenings"
+  },
+  {
+    "name": "Erba Pura",
+    "brand": "Xerjoff",
+    "family": "Citrus Fruity Oriental",
+    "best_weather": ["Mild", "Hot & dry"],
+    "best_occasion": ["Daytime", "Casual", "All seasons"],
+    "summary": "fruity citrus lift with a polished trail"
+  },
+  {
+    "name": "Sauvage",
+    "brand": "Dior",
+    "family": "Woody Fresh",
+    "best_weather": ["Mild", "Cool & dry"],
+    "best_occasion": ["Versatile", "Office", "Casual"],
+    "summary": "woody fresh bergamot and pepper"
+  },
+  {
+    "name": "Born in Roma Uomo",
+    "brand": "Valentino",
+    "family": "Aromatic Woody",
+    "best_weather": ["Mild", "Cool & dry"],
+    "best_occasion": ["Office", "Smart casual"],
+    "summary": "smooth aromatic woods for a clean smart feel"
+  },
+  {
+    "name": "Stronger With You Intensely",
+    "brand": "Emporio Armani",
+    "family": "Oriental Gourmand",
+    "best_weather": ["Cool & dry", "Cold & dry"],
+    "best_occasion": ["Evening", "Date night", "Autumn/Winter"],
+    "summary": "sweet warm gourmand depth"
+  },
+  {
+    "name": "Cool Water",
+    "brand": "Davidoff",
+    "family": "Marine Aromatic",
+    "best_weather": ["Hot & dry", "Mild", "Hot & humid"],
+    "best_occasion": ["Daytime", "Casual", "Sport"],
+    "summary": "simple marine freshness"
+  },
+  {
+    "name": "Hawas for Him",
+    "brand": "Rasasi",
+    "family": "Aquatic Woody",
+    "best_weather": ["Mild", "Hot & humid", "Hot & dry"],
+    "best_occasion": ["Casual", "Daytime"],
+    "summary": "sweet aquatic woods with easy projection"
+  },
+  {
+    "name": "Vulcan Feu",
+    "brand": "French Avenue",
+    "family": "Oriental Woody",
+    "best_weather": ["Mild", "Cool & dry"],
+    "best_occasion": ["Evening", "Smart casual"],
+    "summary": "evening-leaning oriental woods"
+  },
+  {
+    "name": "Island Vanilla Dunes",
+    "brand": "Khadlaj",
+    "family": "Oriental Gourmand",
+    "best_weather": ["Cold & dry", "Cold & rainy"],
+    "best_occasion": ["Evening", "Night out", "Winter"],
+    "summary": "soft vanilla gourmand warmth"
+  },
+  {
+    "name": "Club de Nuit Intense Man",
+    "brand": "Armaf",
+    "family": "Fruity Woody",
+    "best_weather": ["Mild", "Cool & dry"],
+    "best_occasion": ["Evening", "Office", "Versatile"],
+    "summary": "fruity woods with sharper evening presence"
+  },
+  {
+    "name": "Imagination",
+    "brand": "Louis Vuitton",
+    "family": "Citrus Aromatic",
+    "best_weather": ["Mild", "Hot & dry", "Cool & dry"],
+    "best_occasion": ["Daytime", "Office", "All seasons"],
+    "summary": "clean citrus aromatic brightness"
+  },
+  {
+    "name": "Sultan Vetiver",
+    "brand": "Nishane",
+    "family": "Amber Woody Vetiver",
+    "best_weather": ["Cool & dry", "Cold & dry", "Cold & rainy"],
+    "best_occasion": ["Evening", "Formal", "Autumn/Winter"],
+    "summary": "dry vetiver structure with amber woods"
+  }
+]

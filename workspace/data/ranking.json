@@ -1,0 +1,38 @@
+{
+  "Hot & dry": {
+    "Daytime": ["French Riviera", "Imagination", "Cool Water", "Hawas for Him", "Erba Pura"],
+    "Evening": ["Erba Pura", "Imagination", "Hawas for Him", "French Riviera", "Cool Water"],
+    "Office": ["Imagination", "French Riviera", "Cool Water", "Hawas for Him"],
+    "Date": ["Erba Pura", "Imagination", "Hawas for Him", "French Riviera"]
+  },
+  "Hot & humid": {
+    "Daytime": ["French Riviera", "Le Beau", "Cool Water", "Hawas for Him"],
+    "Evening": ["Le Beau", "French Riviera", "Hawas for Him", "Cool Water"],
+    "Office": ["French Riviera", "Cool Water", "Hawas for Him", "Le Beau"],
+    "Date": ["Le Beau", "French Riviera", "Hawas for Him"]
+  },
+  "Mild": {
+    "Daytime": ["Imagination", "Sauvage", "Born in Roma Uomo", "French Riviera", "Erba Pura"],
+    "Evening": ["Vulcan Feu", "Club de Nuit Intense Man", "Erba Pura", "Born in Roma Uomo", "Sauvage"],
+    "Office": ["Imagination", "Born in Roma Uomo", "Sauvage", "Club de Nuit Intense Man"],
+    "Date": ["Vulcan Feu", "Club de Nuit Intense Man", "Erba Pura", "Born in Roma Uomo"]
+  },
+  "Cool & dry": {
+    "Daytime": ["Imagination", "Sauvage", "Born in Roma Uomo", "Sultan Vetiver"],
+    "Evening": ["Sultan Vetiver", "Stronger With You Intensely", "Vulcan Feu", "Club de Nuit Intense Man", "Sauvage"],
+    "Office": ["Imagination", "Born in Roma Uomo", "Sauvage", "Club de Nuit Intense Man"],
+    "Date": ["Stronger With You Intensely", "Sultan Vetiver", "Vulcan Feu", "Club de Nuit Intense Man"]
+  },
+  "Cold & dry": {
+    "Daytime": ["Sultan Vetiver", "Stronger With You Intensely", "Le Male Elixir"],
+    "Evening": ["Le Male Elixir", "Stronger With You Intensely", "Island Vanilla Dunes", "Sultan Vetiver"],
+    "Office": ["Sultan Vetiver", "Stronger With You Intensely", "Le Male Elixir"],
+    "Date": ["Le Male Elixir", "Stronger With You Intensely", "Island Vanilla Dunes", "Sultan Vetiver"]
+  },
+  "Cold & rainy": {
+    "Daytime": ["Sultan Vetiver", "Le Male Elixir", "Island Vanilla Dunes"],
+    "Evening": ["Le Male Elixir", "Island Vanilla Dunes", "Sultan Vetiver"],
+    "Office": ["Sultan Vetiver", "Le Male Elixir", "Island Vanilla Dunes"],
+    "Date": ["Le Male Elixir", "Island Vanilla Dunes", "Sultan Vetiver"]
+  }
+}

@@ -6,17 +6,19 @@ always: true
 
 # Perfume Advisor — Collection & Selection Rules
 
-This skill contains the owner's perfume collection and the algorithm for selecting the best perfume based on weather and occasion. The main agent handles weather retrieval via `exec` with `curl`. This skill provides the data and logic only.
+This skill documents the owner's perfume collection and selection rules. The executable source of truth is `workspace/tools/perfume_tool.py` with data in `workspace/data/fragrances.json` and `workspace/data/ranking.json`.
+
+For recommendation, history, stats, feedback, travel mode, and collection-management requests, call the deterministic tool through `exec`. Use this markdown as human-readable domain context only.
 
 Always recommend ONLY from the collection below. Never suggest perfumes outside this list.
 Always choose exactly one perfume by name. Never give a generic scent-family-only recommendation.
 Always present temperatures in °C. Convert if needed.
 
-## Strict Selection Algorithm
+## Strict Selection Algorithm Implemented By The Tool
 
 ### Step 0 — Check Recent Recommendations
 
-BEFORE selecting a perfume, read `workspace/memory/RECENT_PICKS.md` to check:
+Before selecting a perfume, the tool reads `workspace/memory/RECENT_PICKS.md` to check:
 1. **What was recommended yesterday for the SAME city and SAME weather bucket**
 2. **What was recommended yesterday** regardless of city or weather (global consecutive day rule)
 
@@ -67,7 +69,7 @@ Pick the first eligible perfume from the ranked list after applying all rotation
 
 ### Step 6 — Log the Recommendation
 
-After making a recommendation, append to `workspace/memory/RECENT_PICKS.md`:
+After making a recommendation, the tool appends to `workspace/memory/RECENT_PICKS.md`:
 ```
 | YYYY-MM-DD | [City Name] | [Weather Bucket] | [Occasion] | [Perfume Name] |
 ```

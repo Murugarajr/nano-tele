@@ -1,1 +1,2 @@
-nanobot-ai==0.1.5.post1
+nanobot-ai>=0.1.5,<0.2
+requests>=2.31,<3

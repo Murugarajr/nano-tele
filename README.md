@@ -1,25 +1,31 @@
 # nano-tele
 
-A personal fragrance concierge Telegram bot powered by [nanobot-ai](https://github.com/hkuds/nanobot) and OpenRouter. It recommends perfumes from a curated collection based on live weather data.
+A personal fragrance concierge Telegram bot powered by [nanobot-ai](https://github.com/hkuds/nanobot) and OpenRouter. It recommends perfumes from a curated collection using deterministic local selection logic and live weather data.
 
 ## What It Does
 
-- **Weather-aware recommendations** — Fetches live weather for your city and matches it to the best fragrance from a personal collection of 14 perfumes.
+- **Weather-aware recommendations** — Fetches structured Open-Meteo weather for your city and matches it to the best fragrance from a personal collection.
 - **Telegram-native** — Replies in a concise, emoji-friendly format optimised for mobile chat.
 - **Collection-only** — Never suggests perfumes outside the saved collection.
+- **Deterministic rotation** — Avoids same-fragrance consecutive-day repeats and logs every recommendation.
+- **Feedback-aware ranking** — Learns from liked/disliked scents and performance notes.
+- **Travel mode** — Temporarily changes the default recommendation city.
+- **Collection management** — Lists, adds, and removes fragrances from the local collection data.
 - **Scheduled reminders** — Supports cron-based reminders and heartbeat tasks for recurring checks.
 
 ## Architecture
 
 ```
-User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + tools + memory)
+User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + deterministic tool + memory)
                               |
                         + Health check server
 ```
 
 - **Gateway** — Routes Telegram messages to the agent and back.
 - **Agent** — Configured via markdown files in `workspace/` (SOUL, AGENTS, USER, TOOLS, HEARTBEAT).
-- **Skills** — Domain knowledge lives in `workspace/skills/perfume-advisor/`.
+- **Perfume tool** — `workspace/tools/perfume_tool.py` handles weather, selection, rotation, feedback, history, travel mode, and collection commands.
+- **Data** — `workspace/data/fragrances.json` and `workspace/data/ranking.json` are the executable fragrance source of truth.
+- **Skills** — Domain documentation lives in `workspace/skills/perfume-advisor/`.
 - **Memory** — Session history and memory are persisted in `workspace/memory/` and `workspace/sessions/`.
 
 ## Tech Stack
@@ -29,7 +35,7 @@ User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + tools + memory)
 | Framework | `nanobot-ai` (Python MCP agent framework) |
 | LLM | DeepSeek V3 via OpenRouter |
 | Channel | Telegram Bot API |
-| Weather | wttr.in (no API key required) |
+| Weather | Open-Meteo (no API key required) |
 | Search | DuckDuckGo |
 
 ## Project Structure
@@ -39,6 +45,7 @@ User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + tools + memory)
 ├── main.py              # Entry point: launches nanobot gateway + health server
 ├── config.json          # Agent, channel, provider & tool configuration
 ├── requirements.txt     # Python dependencies
+├── tests/               # unittest coverage for deterministic selection
 ├── workspace/cron/      # Scheduled job definitions
 ├── history/             # CLI history
 └── workspace/
@@ -47,6 +54,12 @@ User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + tools + memory)
     ├── USER.md          # Owner profile & preferences
     ├── TOOLS.md         # Tool usage notes & safety limits
     ├── HEARTBEAT.md     # Recurring periodic tasks
+    ├── data/
+    │   ├── fragrances.json
+    │   ├── ranking.json
+    │   └── preferences.json
+    ├── tools/
+    │   └── perfume_tool.py
     ├── skills/
     │   └── perfume-advisor/
     │       └── SKILL.md # Fragrance collection & weather pairing rules
@@ -81,11 +94,12 @@ The gateway starts on port `18790` (override with `NANOBOT_PORT`). If a platform
 
 ## How Recommendations Work
 
-1. **Fetch weather** via `wttr.in` for the requested city (default: Sheffield, UK).
-2. **Classify** into a weather bucket (Hot & dry, Hot & humid, Mild, Cool & dry, Cold & dry, Cold & rainy/wet).
+1. **Fetch weather** via Open-Meteo geocoding + current weather + forecast for the requested city.
+2. **Classify** into a weather bucket (Hot & dry, Hot & humid, Mild, Cool & dry, Cold & dry, Cold & rainy).
 3. **Infer occasion** (office, daytime, evening) from time and keywords.
-4. **Select** the top-ranked perfume from the collection that matches both weather and occasion.
-5. **Reply** with two lines: a weather summary and the fragrance pick with a one-line reason.
+4. **Apply feedback and rotation** using `workspace/memory/RECENT_PICKS.md` and `workspace/data/preferences.json`.
+5. **Select** the top-ranked eligible perfume from the collection that matches both weather and occasion.
+6. **Log and reply** with two lines: a weather summary and the fragrance pick with a one-line reason.
 
 Example output:
 
@@ -104,14 +118,50 @@ Example output:
 | Temperature | 0.2 |
 | Timezone | Europe/London |
 | Dream interval | Every 2 hours (`agents.defaults.dream.intervalH`) |
-| Gateway heartbeat interval | Every 24 hours (`gateway.heartbeat.intervalS = 86400`) |
+| Gateway heartbeat interval | Every 30 minutes (`gateway.heartbeat.intervalS = 1800`) |
 | Tool exec timeout | 60s |
 | Web search | DuckDuckGo, max 1 result |
+
+## Commands
+
+These are implemented through `workspace/tools/perfume_tool.py` and are exposed to the agent through `AGENTS.md`.
+
+| Command | Purpose |
+|---------|---------|
+| `/today` | Daytime recommendation for the active city |
+| `/office` | Office-safe recommendation |
+| `/evening` | Evening recommendation |
+| `/date` | Date-night recommendation |
+| `/history` | Last 7 recommendations |
+| `/stats` | SOTD stats: most worn, least worn, weather spread |
+| Travel mode | "I'm in Dubai for 5 days" or "clear travel mode" |
+| Feedback | "I liked Sauvage, lasted well" or "Erba Pura was too sweet" |
+| Collection | "show my collection", "add ...", "remove ..." |
+
+The installed Nanobot Telegram channel does not currently expose inline keyboard reply markup, so shortcut commands are used instead of native Telegram buttons.
+
+## Local Tool Usage
+
+```bash
+python workspace/tools/perfume_tool.py recommend --occasion office --city "Sheffield"
+python workspace/tools/perfume_tool.py history --limit 7
+python workspace/tools/perfume_tool.py stats
+python workspace/tools/perfume_tool.py travel "Dubai"
+python workspace/tools/perfume_tool.py travel --clear
+python workspace/tools/perfume_tool.py collection list
+```
+
+## Tests
+
+```bash
+/Users/ohm/Documents/projects/pyenvs/sandbox/bin/python -m unittest discover -s tests
+```
 
 ## Customising
 
 - **Change city** — Edit `USER.md` default location.
-- **Update collection** — Edit `workspace/skills/perfume-advisor/SKILL.md`.
+- **Update collection** — Prefer `workspace/data/fragrances.json` or the collection command; keep `workspace/skills/perfume-advisor/SKILL.md` in sync as documentation.
+- **Update ranking** — Edit `workspace/data/ranking.json`.
 - **Tweak personality** — Edit `SOUL.md`.
 - **Add heartbeat tasks** — Edit `HEARTBEAT.md`.
 - **Switch model** — Change `model` in `config.json` (any OpenRouter model).
@@ -127,3 +177,4 @@ Example output:
 - [Nanobot GitHub](https://github.com/hkuds/nanobot)
 - [OpenRouter](https://openrouter.ai)
 - [Telegram Bot API](https://core.telegram.org/bots)
+- [Open-Meteo](https://open-meteo.com)

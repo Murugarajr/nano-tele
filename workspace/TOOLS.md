@@ -10,6 +10,22 @@ This file documents non-obvious constraints and usage patterns.
 - Output is truncated at 10,000 characters
 - `restrictToWorkspace` config can limit file access to the workspace
 
+## perfume_tool.py — Fragrance Workflows
+
+Use the local deterministic helper for fragrance workflows:
+
+```bash
+python tools/perfume_tool.py recommend --occasion today --city "Sheffield"
+python tools/perfume_tool.py history --limit 7
+python tools/perfume_tool.py stats
+python tools/perfume_tool.py feedback "Sauvage" liked --notes "lasted well"
+python tools/perfume_tool.py travel "Dubai"
+python tools/perfume_tool.py travel --clear
+python tools/perfume_tool.py collection list
+```
+
+The tool is workspace-local, uses Open-Meteo JSON weather data, and writes recommendation history and feedback into `workspace/memory/`.
+
 ## glob — File Discovery
 
 - Use `glob` to find files by pattern before falling back to shell commands
