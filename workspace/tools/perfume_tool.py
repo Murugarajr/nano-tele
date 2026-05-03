@@ -214,7 +214,7 @@ def get_weather(city: str) -> Weather:
     geo = fetch_json(f"https://geocoding-api.open-meteo.com/v1/search?{query}")
     results = geo.get("results") or []
     if not results:
-        return estimated_weather(city)
+        raise RuntimeError(f"Live weather lookup failed: city not found ({city})")
 
     place = results[0]
     latitude = place["latitude"]
@@ -236,29 +236,18 @@ def get_weather(city: str) -> Weather:
     daily = forecast.get("daily") or {}
     highs = daily.get("temperature_2m_max") or []
     rain = daily.get("precipitation_probability_max") or []
-    return Weather(
-        city=label or city,
-        temp_c=float(current["temperature_2m"]),
-        humidity=int(current["relative_humidity_2m"]),
-        description=weather_description(current.get("weather_code")),
-        wind_kmh=float(current["wind_speed_10m"]) if "wind_speed_10m" in current else None,
-        high_c=float(highs[0]) if highs else None,
-        rain_chance=int(rain[0]) if rain else None,
-    )
-
-
-def estimated_weather(city: str) -> Weather:
-    month = datetime.now().month
-    city_l = city.lower()
-    if any(name in city_l for name in ("dubai", "doha", "riyadh")):
-        return Weather(city=city, temp_c=34, humidity=45, description="estimated hot and dry", estimated=True)
-    if any(name in city_l for name in ("mumbai", "singapore", "bangkok")):
-        return Weather(city=city, temp_c=30, humidity=75, description="estimated hot and humid", estimated=True)
-    if month in {12, 1, 2}:
-        return Weather(city=city, temp_c=7, humidity=72, description="estimated cool and wet", estimated=True)
-    if month in {6, 7, 8}:
-        return Weather(city=city, temp_c=20, humidity=60, description="estimated mild", estimated=True)
-    return Weather(city=city, temp_c=12, humidity=65, description="estimated cool and wet", estimated=True)
+    try:
+        return Weather(
+            city=label or city,
+            temp_c=float(current["temperature_2m"]),
+            humidity=int(current["relative_humidity_2m"]),
+            description=weather_description(current.get("weather_code")),
+            wind_kmh=float(current["wind_speed_10m"]) if "wind_speed_10m" in current else None,
+            high_c=float(highs[0]) if highs else None,
+            rain_chance=int(rain[0]) if rain else None,
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RuntimeError(f"Live weather lookup failed: incomplete weather response for {city}") from exc
 
 
 def parse_recent_rows() -> list[dict[str, str]]:
@@ -377,9 +366,8 @@ def command_recommend(args: argparse.Namespace) -> int:
     try:
         pick = build_pick(args.city, args.occasion, args.text or "")
     except Exception as exc:
-        pick = build_pick(args.city, args.occasion, args.text or "", weather=estimated_weather(active_city(args.city)))
-        print(f"{format_pick(pick)}\n_Note: live weather failed, so this uses an estimate ({exc})._")
-        append_recent_pick(pick)
+        city = active_city(args.city)
+        print(f"Live weather is unavailable for {city} right now, so I cannot make a weather-based recommendation.")
         return 0
     print(format_pick(pick))
     append_recent_pick(pick)

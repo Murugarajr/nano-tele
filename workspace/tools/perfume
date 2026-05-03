@@ -18,6 +18,107 @@ if [ "${1:-}" = "__diag" ]; then
   exit 0
 fi
 
+brand_for_perfume() {
+  case "$1" in
+    "French Riviera") printf '%s\n' "Mancera" ;;
+    "Le Beau"|"Le Male Elixir") printf '%s\n' "Jean Paul Gaultier" ;;
+    "Erba Pura") printf '%s\n' "Xerjoff" ;;
+    "Sauvage") printf '%s\n' "Dior" ;;
+    "Born in Roma Uomo") printf '%s\n' "Valentino" ;;
+    "Stronger With You Intensely") printf '%s\n' "Emporio Armani" ;;
+    "Cool Water") printf '%s\n' "Davidoff" ;;
+    "Hawas for Him") printf '%s\n' "Rasasi" ;;
+    "Vulcan Feu") printf '%s\n' "French Avenue" ;;
+    "Island Vanilla Dunes") printf '%s\n' "Khadlaj" ;;
+    "Club de Nuit Intense Man") printf '%s\n' "Armaf" ;;
+    "Imagination") printf '%s\n' "Louis Vuitton" ;;
+    "Sultan Vetiver") printf '%s\n' "Nishane" ;;
+    *) printf '%s\n' "" ;;
+  esac
+}
+
+reason_for_perfume() {
+  case "$1:$2:$3" in
+    "French Riviera:Hot & humid:"*) printf '%s\n' "its bright citrus-aquatic freshness cuts through hot, humid conditions" ;;
+    "French Riviera:Hot & dry:"*) printf '%s\n' "its bright citrus-aquatic freshness suits hot, dry conditions" ;;
+    "Sultan Vetiver:Cold & rainy:"*) printf '%s\n' "its warm amber-woody vetiver character suits cool, wet conditions" ;;
+    "Vulcan Feu:"*"date"*) printf '%s\n' "its oriental-woody character gives a smart date-night feel" ;;
+    "Vulcan Feu:"*) printf '%s\n' "its oriental-woody character has more presence after dark" ;;
+    "Imagination:"*"office"*) printf '%s\n' "its clean citrus-aromatic profile stays polished for office wear" ;;
+    "Imagination:"*) printf '%s\n' "its clean citrus-aromatic brightness suits mild daytime conditions" ;;
+    "Le Beau:"*) printf '%s\n' "its fresh aquatic sweetness works well when conditions are warm and humid" ;;
+    "Cool Water:"*) printf '%s\n' "its crisp marine freshness is easy to wear in humid weather" ;;
+    "Hawas for Him:"*) printf '%s\n' "its aquatic woody freshness carries well in warm conditions" ;;
+    "Sauvage:"*) printf '%s\n' "its clean woody freshness is a reliable alternative for mild weather" ;;
+    "Born in Roma Uomo:"*) printf '%s\n' "its aromatic woody profile gives a polished mild-weather alternative" ;;
+    "Le Male Elixir:"*) printf '%s\n' "its warm amber-gourmand depth suits cold or wet conditions" ;;
+    "Island Vanilla Dunes:"*) printf '%s\n' "its soft oriental-gourmand warmth fits cold weather" ;;
+    "Stronger With You Intensely:"*) printf '%s\n' "its warm gourmand character works well after dark in cool weather" ;;
+    "Club de Nuit Intense Man:"*) printf '%s\n' "its fruity woody profile adds presence for evening wear" ;;
+    "Erba Pura:"*) printf '%s\n' "its bright fruity-oriental profile gives stronger projection in warm weather" ;;
+    *) printf '%s\n' "it fits today's weather and occasion better than repeating yesterday's pick" ;;
+  esac
+}
+
+candidates_for_bucket() {
+  case "$1:$2" in
+    "Hot & humid:office") printf '%s\n' "French Riviera" "Cool Water" "Hawas for Him" "Le Beau" ;;
+    "Hot & humid:evening") printf '%s\n' "Le Beau" "French Riviera" "Hawas for Him" "Cool Water" ;;
+    "Hot & humid:date") printf '%s\n' "Le Beau" "French Riviera" "Hawas for Him" ;;
+    "Hot & humid:"*) printf '%s\n' "French Riviera" "Le Beau" "Cool Water" "Hawas for Him" ;;
+    "Hot & dry:office") printf '%s\n' "Imagination" "French Riviera" "Cool Water" "Hawas for Him" ;;
+    "Hot & dry:evening") printf '%s\n' "Erba Pura" "Imagination" "Hawas for Him" "French Riviera" "Cool Water" ;;
+    "Hot & dry:date") printf '%s\n' "Erba Pura" "Imagination" "Hawas for Him" "French Riviera" ;;
+    "Hot & dry:"*) printf '%s\n' "French Riviera" "Imagination" "Cool Water" "Hawas for Him" "Erba Pura" ;;
+    "Cold & rainy:evening"|"Cold & rainy:date") printf '%s\n' "Le Male Elixir" "Island Vanilla Dunes" "Sultan Vetiver" ;;
+    "Cold & rainy:"*) printf '%s\n' "Sultan Vetiver" "Le Male Elixir" "Island Vanilla Dunes" ;;
+    "Mild:office") printf '%s\n' "Imagination" "Born in Roma Uomo" "Sauvage" "Club de Nuit Intense Man" ;;
+    "Mild:evening") printf '%s\n' "Vulcan Feu" "Club de Nuit Intense Man" "Erba Pura" "Born in Roma Uomo" "Sauvage" ;;
+    "Mild:date") printf '%s\n' "Vulcan Feu" "Club de Nuit Intense Man" "Erba Pura" "Born in Roma Uomo" ;;
+    "Mild:"*) printf '%s\n' "Imagination" "Sauvage" "Born in Roma Uomo" "French Riviera" "Erba Pura" ;;
+    *) printf '%s\n' "Imagination" "Sauvage" "Born in Roma Uomo" "French Riviera" ;;
+  esac
+}
+
+was_used_yesterday() {
+  RECENT="$SCRIPT_DIR/../memory/RECENT_PICKS.md"
+  [ -n "${YESTERDAY:-}" ] || return 1
+  [ -f "$RECENT" ] || return 1
+  grep -E "^\| $YESTERDAY \|" "$RECENT" | awk -F'|' '{gsub(/^ *| *$/,"",$6); print $6}' | grep -Fxq "$1"
+}
+
+choose_rotated_perfume() {
+  if ! was_used_yesterday "$PERFUME"; then
+    return 0
+  fi
+  CANDIDATE=$(candidates_for_bucket "$BUCKET" "$OCCASION" | while IFS= read -r name; do
+    if ! was_used_yesterday "$name"; then
+      printf '%s\n' "$name"
+      break
+    fi
+  done)
+  if [ -n "$CANDIDATE" ]; then
+    PERFUME="$CANDIDATE"
+    BRAND=$(brand_for_perfume "$PERFUME")
+    REASON=$(reason_for_perfume "$PERFUME" "$BUCKET" "$OCCASION")
+  fi
+}
+
+append_recent_pick() {
+  RECENT="$SCRIPT_DIR/../memory/RECENT_PICKS.md"
+  TODAY=$(date -u +%F 2>/dev/null || date +%F)
+  mkdir -p "$SCRIPT_DIR/../memory" 2>/dev/null || true
+  if [ ! -f "$RECENT" ]; then
+    cat > "$RECENT" <<'EOF'
+# Recent Perfume Recommendations Log
+
+| Date | City | Weather Bucket | Occasion | Perfume |
+|------|------|----------------|----------|---------|
+EOF
+  fi
+  printf '| %s | %s | %s | %s | %s |\n' "$TODAY" "$CITY" "$BUCKET" "$OCCASION" "$PERFUME" >> "$RECENT"
+}
+
 if [ "${1:-}" = "route" ] && [ "${2:-}" = "--text" ]; then
   TEXT="${3:-}"
   LOWER=$(printf '%s' "$TEXT" | tr '[:upper:]' '[:lower:]')
@@ -93,6 +194,7 @@ EOF
     PERFUME="Imagination"
     BRAND="Louis Vuitton"
     REASON="its clean citrus-aromatic brightness suits mild daytime conditions"
+    YESTERDAY=$(date -u -v-1d +%F 2>/dev/null || date -u -d yesterday +%F 2>/dev/null || true)
 
     if printf '%s' "$LOWER" | grep -Eq 'office|work|meeting|^/office'; then
       OCCASION="office"
@@ -111,36 +213,79 @@ EOF
       REASON="its oriental-woody character has more presence after dark"
     fi
 
-    if [ "$CITY" = "Chennai" ] || [ "$CITY" = "Mumbai" ] || [ "$CITY" = "Singapore" ] || [ "$CITY" = "Bangkok" ]; then
+    LIVE_WEATHER=""
+    if command -v curl >/dev/null 2>&1; then
+      WTTR_CITY=$(printf '%s' "$CITY" | sed 's/ /+/g')
+      LIVE_WEATHER=$(curl -fsS --max-time 6 "https://wttr.in/${WTTR_CITY}?format=%t|%C|%h" 2>/dev/null || true)
+    fi
+
+    if ! printf '%s' "$LIVE_WEATHER" | grep -q '|'; then
+      printf 'Live weather is unavailable for %s right now, so I cannot make a weather-based recommendation.\n' "$CITY"
+      exit 0
+    fi
+
+    TEMP=$(printf '%s' "$LIVE_WEATHER" | awk -F'|' '{print $1}' | sed 's/^+//;s/^ *//;s/ *$//')
+    CONDITION=$(printf '%s' "$LIVE_WEATHER" | awk -F'|' '{print $2}' | sed 's/^ *//;s/ *$//')
+    HUMIDITY_RAW=$(printf '%s' "$LIVE_WEATHER" | awk -F'|' '{print $3}' | sed 's/^ *//;s/ *$//')
+    HUMIDITY="${HUMIDITY_RAW} humidity"
+
+    TEMP_NUM=$(printf '%s' "$TEMP" | sed 's/°C//;s/[^0-9-]//g')
+    HUMIDITY_NUM=$(printf '%s' "$HUMIDITY_RAW" | sed 's/[^0-9]//g')
+    CONDITION_LOWER=$(printf '%s' "$CONDITION" | tr '[:upper:]' '[:lower:]')
+
+    if [ -z "$TEMP_NUM" ] || [ -z "$HUMIDITY_NUM" ] || [ -z "$CONDITION" ]; then
+      printf 'Live weather is unavailable for %s right now, so I cannot make a weather-based recommendation.\n' "$CITY"
+      exit 0
+    fi
+
+    EMOJI="🌤️"
+    if printf '%s' "$CONDITION_LOWER" | grep -Eq 'rain|drizzle|shower'; then
+      EMOJI="🌧️"
+    elif printf '%s' "$CONDITION_LOWER" | grep -Eq 'sun|clear'; then
+      EMOJI="☀️"
+    elif printf '%s' "$CONDITION_LOWER" | grep -Eq 'cloud|overcast'; then
+      EMOJI="🌥️"
+    elif printf '%s' "$CONDITION_LOWER" | grep -Eq 'mist|fog|haze'; then
+      EMOJI="🌫️"
+    fi
+
+    if [ "$TEMP_NUM" -gt 25 ] && [ "$HUMIDITY_NUM" -ge 50 ]; then
+      BUCKET="Hot & humid"
       PERFUME="French Riviera"
       BRAND="Mancera"
       REASON="its bright citrus-aquatic freshness cuts through hot, humid conditions"
-      TEMP="31°C"
-      CONDITION="humid"
-      HUMIDITY="78% humidity"
-      EMOJI="🌤️"
-    elif [ "$CITY" = "Dubai" ]; then
+    elif [ "$TEMP_NUM" -gt 25 ]; then
+      BUCKET="Hot & dry"
       PERFUME="French Riviera"
       BRAND="Mancera"
       REASON="its bright citrus-aquatic freshness suits hot, dry conditions"
-      TEMP="34°C"
-      CONDITION="sunny"
-      HUMIDITY="42% humidity"
-      EMOJI="☀️"
-    elif [ "$CITY" = "London" ] || [ "$CITY" = "Manchester" ] || [ "$CITY" = "Sheffield" ]; then
-      TEMP="15°C"
-      CONDITION="cloudy"
-      HUMIDITY="65% humidity"
-      EMOJI="🌥️"
+    elif [ "$TEMP_NUM" -lt 15 ] && { [ "$HUMIDITY_NUM" -ge 70 ] || printf '%s' "$CONDITION_LOWER" | grep -Eq 'rain|drizzle|shower'; }; then
+      BUCKET="Cold & rainy"
+      PERFUME="Sultan Vetiver"
+      BRAND="Nishane"
+      REASON="its warm amber-woody vetiver character suits cool, wet conditions"
     else
-      TEMP="18°C"
-      CONDITION="mild"
-      HUMIDITY="60% humidity"
-      EMOJI="🌤️"
+      BUCKET="Mild"
     fi
 
+    if [ "$BUCKET" = "Mild" ] && [ "$OCCASION" = "office" ]; then
+      PERFUME="Imagination"
+      BRAND="Louis Vuitton"
+      REASON="its clean citrus-aromatic profile stays polished for office wear"
+    elif [ "$BUCKET" = "Mild" ] && [ "$OCCASION" = "date" ]; then
+      PERFUME="Vulcan Feu"
+      BRAND="French Avenue"
+      REASON="its oriental-woody character gives a smart date-night feel"
+    elif [ "$BUCKET" = "Mild" ] && [ "$OCCASION" = "evening" ]; then
+      PERFUME="Vulcan Feu"
+      BRAND="French Avenue"
+      REASON="its oriental-woody character has more presence after dark"
+    fi
+
+    choose_rotated_perfume
     printf '%s %s today: %s, %s, %s\n' "$EMOJI" "$CITY" "$TEMP" "$CONDITION" "$HUMIDITY"
     printf '💨 Wear %s by %s — %s.\n' "$PERFUME" "$BRAND" "$REASON"
+    append_recent_pick
     exit 0
   fi
 fi
