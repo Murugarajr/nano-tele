@@ -119,6 +119,70 @@ EOF
   printf '| %s | %s | %s | %s | %s |\n' "$TODAY" "$CITY" "$BUCKET" "$OCCASION" "$PERFUME" >> "$RECENT"
 }
 
+title_case_city() {
+  printf '%s' "$1" | awk '{for (i=1; i<=NF; i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'
+}
+
+clean_city_candidate() {
+  printf '%s' "$1" |
+    sed "s/[?!.]//g;s/^ *//;s/ *$//;s/[[:space:]]\\+/ /g" |
+    sed "s/for a party.*//;s/for party.*//;s/for office.*//;s/for work.*//;s/for date.*//;s/with friends//;s/to go out//" |
+    sed "s/today//g;s/tomorrow//g;s/tonight//g;s/daytime//g;s/evening//g;s/^ *//;s/ *$//;s/[[:space:]]\\+/ /g"
+}
+
+extract_city() {
+  cleaned=$(printf '%s' "$LOWER" | sed "s/[?!.]//g;s/[[:space:]]\\+/ /g;s/^ *//;s/ *$//")
+
+  candidate=$(printf '%s' "$cleaned" | sed -n "s/.*[[:space:]]in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|for\\|at\\|to\\|with\\).*$/\\1/p;s/^in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|for\\|at\\|to\\|with\\).*$/\\1/p;s/.*[[:space:]]in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\1/p;s/^in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\1/p" | head -n 1)
+  candidate=$(clean_city_candidate "$candidate")
+  if [ -n "$candidate" ]; then
+    title_case_city "$candidate"
+    return 0
+  fi
+
+  candidate=""
+  case "$cleaned" in
+    /today\ *|/office\ *|/evening\ *|/date\ *)
+      candidate=$(printf '%s' "$cleaned" | sed 's#^/[a-z][a-z]*[[:space:]]*##')
+      ;;
+    today\ *|tomorrow\ *|office\ *|evening\ *|date\ *)
+      candidate=$(printf '%s' "$cleaned" | sed 's#^[a-z][a-z]*[[:space:]]*##')
+      ;;
+  esac
+  candidate=$(clean_city_candidate "$candidate")
+  if [ -n "$candidate" ]; then
+    title_case_city "$candidate"
+    return 0
+  fi
+
+  candidate=$(printf '%s' "$cleaned" | sed -n "s/^\/\\(today\\|office\\|evening\\|date\\)[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\2/p;s/^\\(today\\|tomorrow\\|office\\|evening\\|date\\)[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\2/p" | head -n 1)
+  candidate=$(clean_city_candidate "$candidate")
+  if [ -n "$candidate" ]; then
+    title_case_city "$candidate"
+    return 0
+  fi
+
+  candidate=$(printf '%s' "$cleaned" | sed -n "s/^\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\)$/\\1/p" | head -n 1)
+  candidate=$(clean_city_candidate "$candidate")
+  if [ -n "$candidate" ]; then
+    title_case_city "$candidate"
+    return 0
+  fi
+
+  candidate=$(printf '%s' "$cleaned" | sed "s/^what should i wear[[:space:]]*//;s/^what perfume should i wear[[:space:]]*//;s/^which perfume should i wear[[:space:]]*//;s/^perfume to wear[[:space:]]*//;s/^fragrance to wear[[:space:]]*//;s/^scent to wear[[:space:]]*//;s/^wear[[:space:]]*//")
+  candidate=$(clean_city_candidate "$candidate")
+  case "$candidate" in
+    ""|"today"|"tomorrow"|"tonight"|"perfume"|"fragrance"|"scent"|"what"|"which"|"office"|"evening"|"date"|"work"|"meeting")
+      ;;
+    *)
+      title_case_city "$candidate"
+      return 0
+      ;;
+  esac
+
+  printf '%s\n' "Sheffield"
+}
+
 if [ "${1:-}" = "route" ] && [ "${2:-}" = "--text" ]; then
   TEXT="${3:-}"
   LOWER=$(printf '%s' "$TEXT" | tr '[:upper:]' '[:lower:]')
@@ -162,32 +226,13 @@ EOF
   esac
 
   if printf '%s' "$LOWER" | grep -Eq '(^/today|^today\b| today\b|^/office|^office\b|^/evening|^evening\b|^/date|^date\b|wear|perfume|fragrance|scent)'; then
-    CITY="Sheffield"
-    if printf '%s' "$LOWER" | grep -q 'london'; then
-      CITY="London"
-    elif printf '%s' "$LOWER" | grep -q 'chennai'; then
-      CITY="Chennai"
-    elif printf '%s' "$LOWER" | grep -q 'mumbai'; then
-      CITY="Mumbai"
-    elif printf '%s' "$LOWER" | grep -q 'singapore'; then
-      CITY="Singapore"
-    elif printf '%s' "$LOWER" | grep -q 'bangkok'; then
-      CITY="Bangkok"
-    elif printf '%s' "$LOWER" | grep -q 'manchester'; then
-      CITY="Manchester"
-    elif printf '%s' "$LOWER" | grep -q 'dubai'; then
-      CITY="Dubai"
-    elif printf '%s' "$LOWER" | grep -q 'sheffield'; then
-      CITY="Sheffield"
-    else
-      FIRST_WORD=$(printf '%s' "$LOWER" | sed 's/^\/today[[:space:]]*//;s/^\/office[[:space:]]*//;s/^\/evening[[:space:]]*//;s/^\/date[[:space:]]*//;s/[?!.]//g' | awk '{print $1}')
-      case "$FIRST_WORD" in
-        today|tonight|perfume|fragrance|scent|wear|what|which|office|evening|date|"")
-          ;;
-        *)
-          CITY=$(printf '%s' "$FIRST_WORD" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')
-          ;;
-      esac
+    CITY=$(extract_city)
+
+    DAY_LABEL="today"
+    WEATHER_INDEX=0
+    if printf '%s' "$LOWER" | grep -q 'tomorrow'; then
+      DAY_LABEL="tomorrow"
+      WEATHER_INDEX=1
     fi
 
     OCCASION="daytime"
@@ -216,11 +261,29 @@ EOF
     LIVE_WEATHER=""
     if command -v curl >/dev/null 2>&1; then
       WTTR_CITY=$(printf '%s' "$CITY" | sed 's/ /+/g')
-      LIVE_WEATHER=$(curl -fsS --max-time 6 "https://wttr.in/${WTTR_CITY}?format=%t|%C|%h" 2>/dev/null || true)
+      if [ "$WEATHER_INDEX" -eq 0 ]; then
+        LIVE_WEATHER=$(curl -fsS --max-time 6 "https://wttr.in/${WTTR_CITY}?format=%t|%C|%h" 2>/dev/null || true)
+      elif command -v python3 >/dev/null 2>&1; then
+        LIVE_WEATHER=$(curl -fsS --max-time 8 "https://wttr.in/${WTTR_CITY}?format=j1" 2>/dev/null | python3 -c 'import json,sys
+data=json.load(sys.stdin)
+weather=data.get("weather") or []
+if len(weather) < 2:
+    raise SystemExit(1)
+day=weather[1]
+hourly=day.get("hourly") or []
+hour=hourly[4] if len(hourly) > 4 else (hourly[len(hourly)//2] if hourly else {})
+desc=((hour.get("weatherDesc") or [{}])[0].get("value") or "").strip()
+temp=(day.get("avgtempC") or "").strip()
+humidity=(hour.get("humidity") or "").strip()
+if not temp or not desc or not humidity:
+    raise SystemExit(1)
+print(f"{temp}°C|{desc}|{humidity}%")
+' 2>/dev/null || true)
+      fi
     fi
 
     if ! printf '%s' "$LIVE_WEATHER" | grep -q '|'; then
-      printf 'Live weather is unavailable for %s right now, so I cannot make a weather-based recommendation.\n' "$CITY"
+      printf 'Live weather is unavailable for %s %s, so I cannot make a weather-based recommendation.\n' "$CITY" "$DAY_LABEL"
       exit 0
     fi
 
@@ -234,7 +297,7 @@ EOF
     CONDITION_LOWER=$(printf '%s' "$CONDITION" | tr '[:upper:]' '[:lower:]')
 
     if [ -z "$TEMP_NUM" ] || [ -z "$HUMIDITY_NUM" ] || [ -z "$CONDITION" ]; then
-      printf 'Live weather is unavailable for %s right now, so I cannot make a weather-based recommendation.\n' "$CITY"
+      printf 'Live weather is unavailable for %s %s, so I cannot make a weather-based recommendation.\n' "$CITY" "$DAY_LABEL"
       exit 0
     fi
 
@@ -283,7 +346,7 @@ EOF
     fi
 
     choose_rotated_perfume
-    printf '%s %s today: %s, %s, %s\n' "$EMOJI" "$CITY" "$TEMP" "$CONDITION" "$HUMIDITY"
+    printf '%s %s %s: %s, %s, %s\n' "$EMOJI" "$CITY" "$DAY_LABEL" "$TEMP" "$CONDITION" "$HUMIDITY"
     printf '💨 Wear %s by %s — %s.\n' "$PERFUME" "$BRAND" "$REASON"
     append_recent_pick
     exit 0
