@@ -120,6 +120,11 @@ EOF
 }
 
 title_case_city() {
+  upper=$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')
+  if printf '%s' "${TEXT:-}" | grep -Eq "(^|[^[:alpha:]])$upper([^[:alpha:]]|$)"; then
+    printf '%s\n' "$upper"
+    return 0
+  fi
   printf '%s' "$1" | awk '{for (i=1; i<=NF; i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'
 }
 
@@ -127,13 +132,13 @@ clean_city_candidate() {
   printf '%s' "$1" |
     sed "s/[?!.]//g;s/^ *//;s/ *$//;s/[[:space:]]\\+/ /g" |
     sed "s/for a party.*//;s/for party.*//;s/for office.*//;s/for work.*//;s/for date.*//;s/with friends//;s/to go out//" |
-    sed "s/today//g;s/tomorrow//g;s/tonight//g;s/daytime//g;s/evening//g;s/^ *//;s/ *$//;s/[[:space:]]\\+/ /g"
+    sed "s/today//g;s/tomorrow//g;s/tonight//g;s/now//g;s/daytime//g;s/evening//g;s/^in //;s/^at //;s/^ *//;s/ *$//;s/[[:space:]]\\+/ /g"
 }
 
 extract_city() {
   cleaned=$(printf '%s' "$LOWER" | sed "s/[?!.]//g;s/[[:space:]]\\+/ /g;s/^ *//;s/ *$//")
 
-  candidate=$(printf '%s' "$cleaned" | sed -n "s/.*[[:space:]]in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|for\\|at\\|to\\|with\\).*$/\\1/p;s/^in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|for\\|at\\|to\\|with\\).*$/\\1/p;s/.*[[:space:]]in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\1/p;s/^in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\1/p" | head -n 1)
+  candidate=$(printf '%s' "$cleaned" | sed -n "s/.*[[:space:]]in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|now\\|for\\|at\\|to\\|with\\).*$/\\1/p;s/^in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|now\\|for\\|at\\|to\\|with\\).*$/\\1/p;s/.*[[:space:]]in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\1/p;s/^in[[:space:]]\\{1,\\}\\([a-z][a-z .'-]*\\)$/\\1/p" | head -n 1)
   candidate=$(clean_city_candidate "$candidate")
   if [ -n "$candidate" ]; then
     title_case_city "$candidate"
@@ -162,7 +167,7 @@ extract_city() {
     return 0
   fi
 
-  candidate=$(printf '%s' "$cleaned" | sed -n "s/^\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\)$/\\1/p" | head -n 1)
+  candidate=$(printf '%s' "$cleaned" | sed -n "s/^\\([a-z][a-z .'-]*\\)[[:space:]]\\{1,\\}\\(today\\|tomorrow\\|tonight\\|now\\)$/\\1/p" | head -n 1)
   candidate=$(clean_city_candidate "$candidate")
   if [ -n "$candidate" ]; then
     title_case_city "$candidate"
@@ -225,7 +230,7 @@ EOF
       ;;
   esac
 
-  if printf '%s' "$LOWER" | grep -Eq '(^/today|^today\b| today\b|^/office|^office\b|^/evening|^evening\b|^/date|^date\b|wear|perfume|fragrance|scent)'; then
+  if printf '%s' "$LOWER" | grep -Eq '(^/today|^today\b| today\b|^tomorrow\b| tomorrow\b|^now\b| now\b|^/office|^office\b|^/evening|^evening\b|^/date|^date\b|wear|perfume|fragrance|scent)'; then
     CITY=$(extract_city)
 
     DAY_LABEL="today"
