@@ -119,6 +119,70 @@ EOF
   printf '| %s | %s | %s | %s | %s |\n' "$TODAY" "$CITY" "$BUCKET" "$OCCASION" "$PERFUME" >> "$RECENT"
 }
 
+python_bin() {
+  command -v python3 2>/dev/null || command -v python 2>/dev/null || true
+}
+
+fetch_current_weather_python() {
+  PY_BIN=$(python_bin)
+  [ -n "$PY_BIN" ] || return 1
+  "$PY_BIN" -c 'import sys
+import ssl
+import urllib.parse
+import urllib.request
+
+city = sys.argv[1]
+url = "https://wttr.in/%s?format=%%t|%%C|%%h" % urllib.parse.quote(city)
+request = urllib.request.Request(url, headers={"User-Agent": "nano-tele/1.0"})
+try:
+    with urllib.request.urlopen(request, timeout=8) as response:
+        text = response.read().decode("utf-8").strip()
+except Exception as exc:
+    if "CERTIFICATE_VERIFY_FAILED" not in str(exc):
+        raise
+    with urllib.request.urlopen(request, timeout=8, context=ssl._create_unverified_context()) as response:
+        text = response.read().decode("utf-8").strip()
+if "|" not in text:
+    raise SystemExit(1)
+print(text)
+' "$CITY" 2>/dev/null
+}
+
+fetch_tomorrow_weather_python() {
+  PY_BIN=$(python_bin)
+  [ -n "$PY_BIN" ] || return 1
+  "$PY_BIN" -c 'import json
+import ssl
+import sys
+import urllib.parse
+import urllib.request
+
+city = sys.argv[1]
+url = "https://wttr.in/%s?format=j1" % urllib.parse.quote(city)
+request = urllib.request.Request(url, headers={"User-Agent": "nano-tele/1.0"})
+try:
+    with urllib.request.urlopen(request, timeout=10) as response:
+        data = json.loads(response.read().decode("utf-8"))
+except Exception as exc:
+    if "CERTIFICATE_VERIFY_FAILED" not in str(exc):
+        raise
+    with urllib.request.urlopen(request, timeout=10, context=ssl._create_unverified_context()) as response:
+        data = json.loads(response.read().decode("utf-8"))
+weather = data.get("weather") or []
+if len(weather) < 2:
+    raise SystemExit(1)
+day = weather[1]
+hourly = day.get("hourly") or []
+hour = hourly[4] if len(hourly) > 4 else (hourly[len(hourly) // 2] if hourly else {})
+desc = ((hour.get("weatherDesc") or [{}])[0].get("value") or "").strip()
+temp = (day.get("avgtempC") or "").strip()
+humidity = (hour.get("humidity") or "").strip()
+if not temp or not desc or not humidity:
+    raise SystemExit(1)
+print(f"{temp}°C|{desc}|{humidity}%")
+' "$CITY" 2>/dev/null
+}
+
 title_case_city() {
   upper=$(printf '%s' "$1" | tr '[:lower:]' '[:upper:]')
   if printf '%s' "${TEXT:-}" | grep -Eq "(^|[^[:alpha:]])$upper([^[:alpha:]]|$)"; then
@@ -268,8 +332,8 @@ EOF
       WTTR_CITY=$(printf '%s' "$CITY" | sed 's/ /+/g')
       if [ "$WEATHER_INDEX" -eq 0 ]; then
         LIVE_WEATHER=$(curl -fsS --max-time 6 "https://wttr.in/${WTTR_CITY}?format=%t|%C|%h" 2>/dev/null || true)
-      elif command -v python3 >/dev/null 2>&1; then
-        LIVE_WEATHER=$(curl -fsS --max-time 8 "https://wttr.in/${WTTR_CITY}?format=j1" 2>/dev/null | python3 -c 'import json,sys
+      elif command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
+        LIVE_WEATHER=$(curl -fsS --max-time 8 "https://wttr.in/${WTTR_CITY}?format=j1" 2>/dev/null | "$(python_bin)" -c 'import json,sys
 data=json.load(sys.stdin)
 weather=data.get("weather") or []
 if len(weather) < 2:
@@ -284,6 +348,14 @@ if not temp or not desc or not humidity:
     raise SystemExit(1)
 print(f"{temp}°C|{desc}|{humidity}%")
 ' 2>/dev/null || true)
+      fi
+    fi
+
+    if ! printf '%s' "$LIVE_WEATHER" | grep -q '|'; then
+      if [ "$WEATHER_INDEX" -eq 0 ]; then
+        LIVE_WEATHER=$(fetch_current_weather_python || true)
+      else
+        LIVE_WEATHER=$(fetch_tomorrow_weather_python || true)
       fi
     fi
 
