@@ -69,7 +69,7 @@
     "exec": {
       "enable": true,
       "timeout": 60,
-      "pathAppend": "/usr/local/bin:/usr/bin:/bin:/opt/venv/bin",
+      "pathAppend": "/app/.venv/bin:/usr/local/bin:/usr/bin:/bin:/opt/venv/bin",
       "sandbox": ""
     },
     "restrictToWorkspace": true,

@@ -12,6 +12,21 @@ if [ "${1:-}" = "__diag" ]; then
   echo "path=${PATH:-}"
   echo "python3=$(command -v python3 2>/dev/null || true)"
   echo "python=$(command -v python 2>/dev/null || true)"
+  echo "resolved_python=$(
+    if command -v python3 >/dev/null 2>&1; then
+      command -v python3
+    elif command -v python >/dev/null 2>&1; then
+      command -v python
+    elif [ -x "$SCRIPT_DIR/../../.venv/bin/python3" ]; then
+      printf '%s\n' "$SCRIPT_DIR/../../.venv/bin/python3"
+    elif [ -x "$SCRIPT_DIR/../../.venv/bin/python" ]; then
+      printf '%s\n' "$SCRIPT_DIR/../../.venv/bin/python"
+    elif [ -x "/app/.venv/bin/python3" ]; then
+      printf '%s\n' "/app/.venv/bin/python3"
+    elif [ -x "/app/.venv/bin/python" ]; then
+      printf '%s\n' "/app/.venv/bin/python"
+    fi
+  )"
   echo "tool_exists=$(test -f "$SCRIPT_DIR/perfume_tool.py" && echo yes || echo no)"
   echo "data_exists=$(test -f "$SCRIPT_DIR/../data/fragrances.json" && echo yes || echo no)"
   echo "recent_exists=$(test -f "$SCRIPT_DIR/../memory/RECENT_PICKS.md" && echo yes || echo no)"
@@ -120,7 +135,31 @@ EOF
 }
 
 python_bin() {
-  command -v python3 2>/dev/null || command -v python 2>/dev/null || true
+  if command -v python3 >/dev/null 2>&1; then
+    command -v python3
+    return 0
+  fi
+  if command -v python >/dev/null 2>&1; then
+    command -v python
+    return 0
+  fi
+  if [ -x "$SCRIPT_DIR/../../.venv/bin/python3" ]; then
+    printf '%s\n' "$SCRIPT_DIR/../../.venv/bin/python3"
+    return 0
+  fi
+  if [ -x "$SCRIPT_DIR/../../.venv/bin/python" ]; then
+    printf '%s\n' "$SCRIPT_DIR/../../.venv/bin/python"
+    return 0
+  fi
+  if [ -x "/app/.venv/bin/python3" ]; then
+    printf '%s\n' "/app/.venv/bin/python3"
+    return 0
+  fi
+  if [ -x "/app/.venv/bin/python" ]; then
+    printf '%s\n' "/app/.venv/bin/python"
+    return 0
+  fi
+  return 1
 }
 
 fetch_current_weather_python() {
@@ -440,12 +479,9 @@ if [ "${1:-}" = "history" ]; then
   exit 0
 fi
 
-if command -v python3 >/dev/null 2>&1; then
-  exec python3 "$SCRIPT_DIR/perfume_tool.py" "$@"
-fi
-
-if command -v python >/dev/null 2>&1; then
-  exec python "$SCRIPT_DIR/perfume_tool.py" "$@"
+PY_BIN=$(python_bin || true)
+if [ -n "$PY_BIN" ]; then
+  exec "$PY_BIN" "$SCRIPT_DIR/perfume_tool.py" "$@"
 fi
 
 echo "Perfume helper error: python runtime not found" >&2
