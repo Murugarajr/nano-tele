@@ -171,7 +171,7 @@ import urllib.parse
 import urllib.request
 
 city = sys.argv[1]
-url = "https://wttr.in/%s?format=%%t|%%C|%%h" % urllib.parse.quote(city)
+url = "https://wttr.in/%s?m&format=%%t|%%C|%%h" % urllib.parse.quote(city)
 request = urllib.request.Request(url, headers={"User-Agent": "nano-tele/1.0"})
 try:
     with urllib.request.urlopen(request, timeout=8) as response:
@@ -197,7 +197,7 @@ import urllib.parse
 import urllib.request
 
 city = sys.argv[1]
-url = "https://wttr.in/%s?format=j1" % urllib.parse.quote(city)
+url = "https://wttr.in/%s?m&format=j1" % urllib.parse.quote(city)
 request = urllib.request.Request(url, headers={"User-Agent": "nano-tele/1.0"})
 try:
     with urllib.request.urlopen(request, timeout=10) as response:
@@ -370,9 +370,9 @@ EOF
     if command -v curl >/dev/null 2>&1; then
       WTTR_CITY=$(printf '%s' "$CITY" | sed 's/ /+/g')
       if [ "$WEATHER_INDEX" -eq 0 ]; then
-        LIVE_WEATHER=$(curl -fsS --max-time 6 "https://wttr.in/${WTTR_CITY}?format=%t|%C|%h" 2>/dev/null || true)
+        LIVE_WEATHER=$(curl -fsS --max-time 6 "https://wttr.in/${WTTR_CITY}?m&format=%t|%C|%h" 2>/dev/null || true)
       elif command -v python3 >/dev/null 2>&1 || command -v python >/dev/null 2>&1; then
-        LIVE_WEATHER=$(curl -fsS --max-time 8 "https://wttr.in/${WTTR_CITY}?format=j1" 2>/dev/null | "$(python_bin)" -c 'import json,sys
+        LIVE_WEATHER=$(curl -fsS --max-time 8 "https://wttr.in/${WTTR_CITY}?m&format=j1" 2>/dev/null | "$(python_bin)" -c 'import json,sys
 data=json.load(sys.stdin)
 weather=data.get("weather") or []
 if len(weather) < 2:
@@ -407,6 +407,10 @@ print(f"{temp}°C|{desc}|{humidity}%")
     CONDITION=$(printf '%s' "$LIVE_WEATHER" | awk -F'|' '{print $2}' | sed 's/^ *//;s/ *$//')
     HUMIDITY_RAW=$(printf '%s' "$LIVE_WEATHER" | awk -F'|' '{print $3}' | sed 's/^ *//;s/ *$//')
     HUMIDITY="${HUMIDITY_RAW} humidity"
+
+    if printf '%s' "$TEMP" | grep -q '°F'; then
+      TEMP=$(printf '%s' "$TEMP" | sed 's/°F//;s/[^0-9.-]//g' | awk '{printf "%.0f°C", (($1 - 32) * 5 / 9)}')
+    fi
 
     TEMP_NUM=$(printf '%s' "$TEMP" | sed 's/°C//;s/[^0-9-]//g')
     HUMIDITY_NUM=$(printf '%s' "$HUMIDITY_RAW" | sed 's/[^0-9]//g')
