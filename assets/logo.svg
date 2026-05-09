@@ -1,0 +1,70 @@
+<svg width="960" height="320" viewBox="0 0 960 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">nano-tele logo</title>
+  <desc id="desc">A perfume concierge logo combining a fragrance bottle, Telegram paper plane, weather sun and rain, and nano agent nodes.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="960" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0F172A"/>
+      <stop offset="0.5" stop-color="#172554"/>
+      <stop offset="1" stop-color="#312E81"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="280" y1="70" x2="430" y2="270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E0F2FE" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#7DD3FC" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="#38BDF8" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="liquid" x1="288" y1="170" x2="420" y2="270" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDE68A"/>
+      <stop offset="1" stop-color="#F97316"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#020617" flood-opacity="0.35"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="960" height="320" rx="40" fill="url(#bg)"/>
+  <circle cx="820" cy="82" r="38" fill="#FACC15" opacity="0.95" filter="url(#glow)"/>
+  <path d="M780 81H735M905 81H860M820 41V10M820 154V123M792 53L770 31M868 128L846 106M848 53L870 31M770 131L792 109" stroke="#FDE68A" stroke-width="8" stroke-linecap="round" opacity="0.78"/>
+  <path d="M727 188C746 164 784 162 805 185C814 178 827 174 840 176C868 180 887 205 883 233H698C695 216 707 198 727 188Z" fill="#E0F2FE" opacity="0.86"/>
+  <path d="M736 252L724 276M785 252L773 276M835 252L823 276" stroke="#38BDF8" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
+
+  <g opacity="0.36" stroke="#93C5FD" stroke-width="2">
+    <path d="M111 77L164 112L226 72L287 114"/>
+    <path d="M102 221L167 180L229 232L292 191"/>
+    <circle cx="111" cy="77" r="8" fill="#38BDF8"/>
+    <circle cx="164" cy="112" r="6" fill="#A78BFA"/>
+    <circle cx="226" cy="72" r="7" fill="#38BDF8"/>
+    <circle cx="287" cy="114" r="6" fill="#A78BFA"/>
+    <circle cx="102" cy="221" r="7" fill="#A78BFA"/>
+    <circle cx="167" cy="180" r="6" fill="#38BDF8"/>
+    <circle cx="229" cy="232" r="8" fill="#38BDF8"/>
+    <circle cx="292" cy="191" r="6" fill="#A78BFA"/>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <path d="M325 71H387V104H325V71Z" fill="#BFDBFE"/>
+    <path d="M338 43H374C381 43 386 48 386 55V72H326V55C326 48 331 43 338 43Z" fill="#E0F2FE"/>
+    <path d="M294 100H418C433 100 445 112 445 127V254C445 269 433 281 418 281H294C279 281 267 269 267 254V127C267 112 279 100 294 100Z" fill="url(#glass)" stroke="#E0F2FE" stroke-width="5"/>
+    <path d="M286 183C316 163 338 197 365 178C389 161 413 170 426 184V253C426 258 422 262 417 262H295C290 262 286 258 286 253V183Z" fill="url(#liquid)" opacity="0.92"/>
+    <path d="M311 126H402V163H311V126Z" fill="#0F172A" opacity="0.82"/>
+    <text x="356.5" y="151" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="18" font-weight="800" fill="#F8FAFC">SOTD</text>
+    <path d="M295 119C293 119 291 121 291 123V247" stroke="#F8FAFC" stroke-width="5" stroke-linecap="round" opacity="0.5"/>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <path d="M514 143L681 78C691 74 700 84 694 93L606 230C600 239 586 237 583 226L563 162L514 143Z" fill="#38BDF8"/>
+    <path d="M563 162L681 78L589 182L583 226L563 162Z" fill="#BAE6FD" opacity="0.95"/>
+    <path d="M563 162L606 230L589 182L563 162Z" fill="#0284C7" opacity="0.55"/>
+  </g>
+
+  <text x="72" y="151" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="56" font-weight="900" fill="#F8FAFC" letter-spacing="-2">nano-tele</text>
+  <text x="74" y="191" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="#BAE6FD">weather-aware fragrance concierge</text>
+  <path d="M75 214H211" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
+  <path d="M229 214H279" stroke="#38BDF8" stroke-width="6" stroke-linecap="round"/>
+</svg>

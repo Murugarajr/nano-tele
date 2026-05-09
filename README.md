@@ -1,5 +1,9 @@
 # nano-tele
 
+<p align="center">
+  <img src="assets/logo.svg" alt="nano-tele logo: fragrance bottle, Telegram paper plane, weather, and nano agent nodes" width="760">
+</p>
+
 A personal fragrance concierge Telegram bot powered by [nanobot-ai](https://github.com/hkuds/nanobot) and OpenRouter. It recommends perfumes from a curated collection using deterministic local selection logic and live weather data.
 
 ## What It Does
