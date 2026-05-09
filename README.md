@@ -8,7 +8,7 @@ A personal fragrance concierge Telegram bot powered by [nanobot-ai](https://gith
 
 ## What It Does
 
-- **Weather-aware recommendations** — Fetches structured Open-Meteo weather for your city and matches it to the best fragrance from a personal collection.
+- **Weather-aware recommendations** — Fetches live weather for your city and matches it to the best fragrance from a personal collection.
 - **Telegram-native** — Replies in a concise, emoji-friendly format optimised for mobile chat.
 - **Collection-only** — Never suggests perfumes outside the saved collection.
 - **Deterministic rotation** — Avoids same-fragrance consecutive-day repeats and logs every recommendation.
@@ -19,17 +19,35 @@ A personal fragrance concierge Telegram bot powered by [nanobot-ai](https://gith
 
 ## Architecture
 
-```
-User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + deterministic tool + memory)
-                              |
-                        + Health check server
+```mermaid
+flowchart LR
+    user[Telegram User] --> telegram[Telegram Bot API]
+    telegram --> gateway[Nanobot Gateway\nmain.py]
+    gateway --> agent[Fragrance Concierge Agent\nLLM + instructions]
+
+    agent --> tool[Deterministic Perfume Tool\nworkspace/tools/perfume_tool.py]
+    agent --> llm[OpenRouter\nDeepSeek V3]
+
+    tool --> weather[Live Weather\nOpen-Meteo in Python tool\nwttr.in in wrapper fallback]
+    tool --> data[(Collection + Ranking Data\nfragrances.json / ranking.json)]
+    tool --> memory[(Memory + Preferences\nrecent picks / feedback / travel mode)]
+
+    gateway -. health check .-> health[Platform Health Endpoint\nPORT / ok]
 ```
 
-- **Gateway** — Routes Telegram messages to the agent and back.
-- **Agent** — Configured via markdown files in `workspace/` (SOUL, AGENTS, USER, TOOLS, HEARTBEAT).
+**Request flow:**
+
+1. A Telegram message reaches the **Nanobot Gateway** in `main.py`.
+2. The **Agent** reads its runtime instructions from `workspace/` and decides what action is needed.
+3. Fragrance requests go through the deterministic **Perfume Tool**, not guesswork.
+4. The tool combines live weather, the saved collection, ranking rules, feedback, and history.
+5. The selected recommendation is returned through Nanobot back to Telegram.
+
+Key local pieces:
+
+- **Runtime instructions** — `workspace/SOUL.md`, `workspace/AGENTS.md`, `workspace/USER.md`, `workspace/TOOLS.md`, `workspace/HEARTBEAT.md`.
 - **Perfume tool** — `workspace/tools/perfume_tool.py` handles weather, selection, rotation, feedback, history, travel mode, and collection commands.
 - **Data** — `workspace/data/fragrances.json` and `workspace/data/ranking.json` are the executable fragrance source of truth.
-- **Skills** — Domain documentation lives in `workspace/skills/perfume-advisor/`.
 - **Memory** — Session history and memory are persisted in `workspace/memory/` and `workspace/sessions/`.
 
 ## Tech Stack
@@ -39,7 +57,7 @@ User (Telegram)  <--->  nanobot gateway  <--->  Agent (LLM + deterministic tool 
 | Framework | `nanobot-ai` (Python MCP agent framework) |
 | LLM | DeepSeek V3 via OpenRouter |
 | Channel | Telegram Bot API |
-| Weather | Open-Meteo (no API key required) |
+| Weather | Open-Meteo via `perfume_tool.py`; wttr.in via shell wrapper fallback |
 | Search | DuckDuckGo |
 
 ## Project Structure
@@ -98,7 +116,7 @@ The gateway starts on port `18790` (override with `NANOBOT_PORT`). If a platform
 
 ## How Recommendations Work
 
-1. **Fetch weather** via Open-Meteo geocoding + current weather + forecast for the requested city.
+1. **Fetch weather** for the requested city. The canonical Python tool uses Open-Meteo; the Nanobot shell wrapper can use wttr.in as its lightweight runtime path/fallback.
 2. **Classify** into a weather bucket (Hot & dry, Hot & humid, Mild, Cool & dry, Cold & dry, Cold & rainy).
 3. **Infer occasion** (office, daytime, evening) from time and keywords.
 4. **Apply feedback and rotation** using `workspace/memory/RECENT_PICKS.md` and `workspace/data/preferences.json`.
@@ -185,3 +203,4 @@ On Railway, Nanobot should call the workspace wrapper (`sh tools/perfume ...`) f
 - [OpenRouter](https://openrouter.ai)
 - [Telegram Bot API](https://core.telegram.org/bots)
 - [Open-Meteo](https://open-meteo.com)
+- [wttr.in](https://wttr.in)
