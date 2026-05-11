@@ -98,11 +98,15 @@ class PerfumeToolTest(unittest.TestCase):
         self.assertEqual(perfume_tool.extract_city("What should I wear in London today?"), "London")
         self.assertEqual(perfume_tool.extract_city("What should I wear London today?"), "London")
         self.assertEqual(perfume_tool.extract_city("/today Manchester"), "Manchester")
+        self.assertEqual(perfume_tool.extract_city("today Manchester"), "Manchester")
+        self.assertEqual(perfume_tool.extract_city("office@perfume_bot London"), "London")
 
     def test_routes_occasion_from_natural_text(self):
         self.assertEqual(perfume_tool.route_occasion("What should I wear in London today?"), "today")
         self.assertEqual(perfume_tool.route_occasion("/evening Manchester"), "evening")
+        self.assertEqual(perfume_tool.route_occasion("evening Manchester"), "evening")
         self.assertEqual(perfume_tool.route_occasion("/today@perfume_bot"), "today")
+        self.assertEqual(perfume_tool.route_occasion("today@perfume_bot"), "today")
         self.assertEqual(perfume_tool.route_occasion("Need something for date night"), "date")
 
     def test_rotation_blocks_yesterdays_global_pick(self):

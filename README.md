@@ -171,8 +171,11 @@ sh workspace/tools/perfume stats
 sh workspace/tools/perfume travel "Dubai"
 sh workspace/tools/perfume travel --clear
 sh workspace/tools/perfume collection list
-sh workspace/tools/perfume route --text "/today"
+sh workspace/tools/perfume route --text "today"
+sh workspace/tools/perfume route --text "history"
 ```
+
+When Nanobot calls the router through `exec`, Telegram slash commands are passed without the leading slash (`/history` becomes `history`). This keeps Nanobot's workspace safety guard from treating the command text as an absolute filesystem path.
 
 ## Tests
 

@@ -148,7 +148,7 @@ def infer_occasion(text: str = "", requested: str | None = None, now: datetime |
 
 def extract_city(text: str) -> str | None:
     cleaned = text.strip()
-    command_match = re.match(r"^/(?:today|office|evening|date)\s+(.+)$", cleaned, flags=re.IGNORECASE)
+    command_match = re.match(r"^/?(?:today|office|evening|date)(?:@\w+)?\s+(.+)$", cleaned, flags=re.IGNORECASE)
     if command_match:
         return tidy_city(command_match.group(1))
 
@@ -174,13 +174,15 @@ def tidy_city(value: str) -> str:
 
 def route_occasion(text: str) -> str | None:
     lowered = text.lower()
-    if lowered.startswith("/office") or any(word in lowered for word in ("office", "work", "meeting")):
+    command_match = re.match(r"^/?([a-z]+)(?:@\w+)?(?:\s+.*)?$", lowered)
+    command = command_match.group(1) if command_match else ""
+    if command == "office" or any(word in lowered for word in ("office", "work", "meeting")):
         return "office"
-    if lowered.startswith("/date") or "date" in lowered:
+    if command == "date" or "date" in lowered:
         return "date"
-    if lowered.startswith("/evening") or any(word in lowered for word in ("evening", "dinner", "party", "night out", "tonight")):
+    if command == "evening" or any(word in lowered for word in ("evening", "dinner", "party", "night out", "tonight")):
         return "evening"
-    if lowered.startswith("/today") or any(phrase in lowered for phrase in ("what should i wear", "perfume", "fragrance", "scent", "wear")):
+    if command == "today" or any(phrase in lowered for phrase in ("what should i wear", "perfume", "fragrance", "scent", "wear")):
         return "today"
     return None
 
